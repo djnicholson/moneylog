@@ -19,6 +19,7 @@
     "electron": "^4.0.4"
   },
   "dependencies": {
+    "blockstack": "^18.2.1",
     "bootstrap": "^4.2.1",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.7",
