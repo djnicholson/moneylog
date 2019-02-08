@@ -1,0 +1,21 @@
+{
+  "name": "moneylog",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djnicholson/moneylog.git"
+  },
+  "author": "David Nicholson",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/djnicholson/moneylog/issues"
+  },
+  "homepage": "https://github.com/djnicholson/moneylog#readme",
+  "devDependencies": {
+    "electron": "^4.0.4"
+  }
+}
