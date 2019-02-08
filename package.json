@@ -1,5 +1,6 @@
 {
   "name": "moneylog",
+  "description": "The financial tracking app",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
