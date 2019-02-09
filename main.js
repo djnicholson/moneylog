@@ -1,12 +1,24 @@
-const { app, session, BrowserWindow } = require('electron');
+const path = require('path')
+const { app, session, BrowserWindow, ipcMain } = require('electron');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
 
 var createWindow = function() {
-    win = new BrowserWindow({ width: 1024, height: 768, webPreferences: { nodeIntegration: false } });
+    
+    win = new BrowserWindow({ 
+        width: 1024, 
+        height: 768, 
+        webPreferences: { 
+            nodeIntegration: false, // only preload script can use Node
+            contextIsolation: false, // preload needs to share window object with rendered page
+            preload: path.join(__dirname, "ipc.js"),
+        },
+    });
+
     win.loadFile('index.html');
+
     win.on('closed', () => {
         win = null;
     });
@@ -28,4 +40,9 @@ app.on('activate', () => {
     if (win === null) {
         createWindow();
     }
+});
+
+ipcMain.on('ping', (event, msg) => {
+   console.log(msg);
+   win.webContents.send('pong', 'hi');
 });
