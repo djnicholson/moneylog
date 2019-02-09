@@ -2,7 +2,7 @@
   "name": "moneylog",
   "description": "The financial tracking app",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "js_app/_main.js",
   "scripts": {
     "start": "./node_modules/sass/sass.js ./scss/_main.scss ./all.css ; electron ."
   },
