@@ -1,1 +1,9 @@
-// todo
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+// See: https://colorhunt.co/palette/137357
+$colorA: #cdffeb;
+$colorB: #009f9d;
+$colorC: #07456f;
+$colorD: #0f0a3c;
+
+@import "body";
