@@ -19,8 +19,8 @@ const { ipcRenderer } = require('electron');
 
     return {
 
-        ping: function(message) {
-            send("ping", message || "PING!");
+        openBrowser: function(url) {
+            send("open-browser", url);
         },
 
     };

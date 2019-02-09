@@ -13,7 +13,7 @@
                 manifest, 
                 REQUIRED_PERMISSIONS);
             var authUrl = "https://browser.blockstack.org/auth?authRequest=" + encodeURIComponent(authRequest);
-            window.open(authUrl);
+            moneylog.ipc.openBrowser(authUrl);
         },
 
     };

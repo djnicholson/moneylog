@@ -1,5 +1,5 @@
 const path = require('path')
-const { app, session, BrowserWindow, ipcMain } = require('electron');
+const { app, session, BrowserWindow, ipcMain, shell, protocol } = require('electron');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,6 +26,12 @@ var createWindow = function() {
 
 app.on('ready', createWindow);
 
+app.on('ready', () => {
+    protocol.registerFileProtocol("moneylog", (req, cb) => {
+        console.log(req);
+    });
+});
+
 app.on('window-all-closed', () => {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
@@ -42,7 +48,9 @@ app.on('activate', () => {
     }
 });
 
-ipcMain.on('ping', (event, msg) => {
-   console.log(msg);
+ipcMain.on('open-browser', (_, url) => {
+   shell.openExternal(url);
    win.webContents.send('pong', 'hi');
 });
+
+
