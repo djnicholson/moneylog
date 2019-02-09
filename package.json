@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "js_app/_main.js",
   "scripts": {
-    "start": "./node_modules/sass/sass.js ./scss/_main.scss ./all.css ; electron ."
+    "start": "./node_modules/sass/sass.js ./scss/_main.scss ./scss/_all.css ; electron ."
   },
   "repository": {
     "type": "git",
