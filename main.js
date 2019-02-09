@@ -5,7 +5,7 @@ const { app, session, BrowserWindow } = require('electron');
 let win;
 
 var createWindow = function() {
-    win = new BrowserWindow({ width: 1024, height: 768, webPreferences: { nodeIntegration: true } });
+    win = new BrowserWindow({ width: 1024, height: 768, webPreferences: { nodeIntegration: false } });
     win.loadFile('index.html');
     win.on('closed', () => {
         win = null;
