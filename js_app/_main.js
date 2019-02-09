@@ -1,8 +1,7 @@
 const path = require("path")
 const { app, session, BrowserWindow, ipcMain, shell, protocol } = require("electron");
+const moneylogapp = require("./_moneylogapp");
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
 let win;
 
 var createWindow = function() {
@@ -48,9 +47,4 @@ app.on("activate", () => {
     }
 });
 
-ipcMain.on("open-browser", (_, url) => {
-   shell.openExternal(url);
-   win.webContents.send('pong', 'hi');
-});
-
-
+ipcMain.on("authentication-start", moneylogapp.authentication.startAuthentication);

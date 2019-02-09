@@ -9,18 +9,14 @@ const { ipcRenderer } = require('electron');
 
     var send = ipcRenderer.send;
 
-    var handlePong = function(event, message) {
-        console.log("IPC message", event, message);
-    };
-
-    ipcRenderer.on("pong", handlePong);
-
-    debugger;
-
     return {
 
-        openBrowser: function(url) {
-            send("open-browser", url);
+        on: function(eventName, handler) {
+            ipcRenderer.on(eventName, handler);
+        },
+
+        startAuthentication: function() {
+            send("authentication-start", "");
         },
 
     };

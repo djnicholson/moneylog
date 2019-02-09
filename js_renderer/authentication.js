@@ -1,19 +1,19 @@
 (window.moneylog = window.moneylog || {}).authentication = (function(){
     
-    var REQUIRED_PERMISSIONS = ["store_write"];
+    var authState = undefined;
+
+    moneylog.ipc.on("set-authentication-state", function(_, state) {
+        authState = state;
+    });
 
     return {
         
-        login: function() {
-            var origin = window.location.origin;
-            var manifest = origin + "/manifest.json";
-            var authRequest = blockstack.makeAuthRequest(
-                blockstack.generateAndStoreTransitKey(),
-                origin, 
-                manifest, 
-                REQUIRED_PERMISSIONS);
-            var authUrl = "https://browser.blockstack.org/auth?authRequest=" + encodeURIComponent(authRequest);
-            moneylog.ipc.openBrowser(authUrl);
+        isAuthenticated: function() {
+            return authState !== undefined;
+        },
+
+        startAuthentication: function() {
+            moneylog.ipc.startAuthentication();
         },
 
     };
