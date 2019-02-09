@@ -6,8 +6,14 @@
         authState = state;
     });
 
+    moneylog.ipc.queryAuthenticationState();
+
     return {
         
+        getUsername: function() {
+            return authState && authState.username;
+        },
+
         isAuthenticated: function() {
             return authState !== undefined;
         },
