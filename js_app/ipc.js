@@ -10,11 +10,12 @@ module.exports = {
         authentication = authenticationRef;
 
         ipcMain.on("authentication-start", authentication.startAuthentication);
-        ipcMain.on("query-authentication-state", authentication.queryAuthenticationState);
+        ipcMain.on("authentication-query", authentication.queryAuthenticationState);
+        ipcMain.on("authentication-signout", authentication.signOut);
     },
 
     setAuthenticationStatus: function(status) {
-        mainWindow.webContents.send("set-authentication-state", status)
+        mainWindow.webContents.send("authentication-set", status)
     },
 
 };

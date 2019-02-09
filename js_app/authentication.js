@@ -67,6 +67,11 @@ module.exports = {
         setAuthenticationStatus();
     },
 
+    signOut: function() {
+        blockstack.signUserOut();
+        setAuthenticationStatus();
+    },
+
     startAuthentication: function() {
         console.log("Authentication requested");
         const transitKey = blockstack.generateAndStoreTransitKey();

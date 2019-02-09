@@ -2,7 +2,7 @@
     
     var authState = undefined;
 
-    moneylog.ipc.on("set-authentication-state", function(_, state) {
+    moneylog.ipc.on("authentication-set", function(_, state) {
         authState = state;
     });
 
@@ -15,7 +15,11 @@
         },
 
         isAuthenticated: function() {
-            return authState !== undefined;
+            return authState != undefined;
+        },
+
+        signOut: function() {
+            moneylog.ipc.signOut();
         },
 
         startAuthentication: function() {

@@ -15,7 +15,9 @@ const { ipcRenderer } = require('electron');
             ipcRenderer.on(eventName, handler);
         },
 
-        queryAuthenticationState: function() { send("query-authentication-state", ""); },
+        queryAuthenticationState: function() { send("authentication-query", ""); },
+
+        signOut: function() { send("authentication-signout", ""); },
 
         startAuthentication: function() { send("authentication-start", ""); },
 
