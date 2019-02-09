@@ -5,6 +5,10 @@
         window.location.href = "index.html";
     });
 
+    $(".-sign-in-link").click(function(){ 
+        moneylog.authentication.startAuthentication();
+    });
+
     return {
         
     };
