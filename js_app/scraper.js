@@ -26,6 +26,7 @@ const CODE_EXTRACT_DATA =
 
 let BrowserWindow = undefined;
 let ipc = undefined;
+let mainWindow = undefined;
 
 let nextId = 0;
 let allWindows = { };
@@ -61,8 +62,9 @@ module.exports = {
 
     closeWindow: closeWindow,
 
-    init: function(BrowserWindowRef, session, ipcRef) {
+    init: function(BrowserWindowRef, mainWindowRef, session, ipcRef) {
         BrowserWindow = BrowserWindowRef;
+        mainWindow = mainWindowRef;
         ipc = ipcRef;
 
         // Spoof User-Agent to look like a regular web browser:
@@ -75,11 +77,14 @@ module.exports = {
     },
 
     newWindow: function(url) {
-        let thisId = nextId++;
+        const thisId = nextId++;
 
-        let newWindow = new BrowserWindow({ 
+        const mainWindowBounds = mainWindow.getNormalBounds();
+        const newWindow = new BrowserWindow({ 
             width: SCRAPER_WINDOW_WIDTH, 
             height: SCRAPER_WINDOW_HEIGHT, 
+            x: mainWindowBounds.x + mainWindowBounds.width,
+            y: mainWindowBounds.y,
             webPreferences: { nodeIntegration: false },
         });
 
@@ -94,7 +99,7 @@ module.exports = {
             e.preventDefault();
         });
 
-        let extractData = function() {
+        const extractData = function() {
             newWindow.webContents.executeJavaScript(CODE_EXTRACT_DATA).then((extractedData) => {
                 const numbers = extractedData.numbers;
                 numbers.forEach(result => { result.value = parseNumber(result.value); });
