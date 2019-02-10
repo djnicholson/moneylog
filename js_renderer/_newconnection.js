@@ -199,6 +199,23 @@ document.body.onload = function() {
     $("#recording").on("reset", startRecording);
     $("#testing").on("reset", startRecording);
     $("#testing").submit(startTesting);
+
+    $("#addCustomClick").click(function() {
+        addToRecipe({ action: "click", selector: $("#customClickSelector").val() }); 
+    });
+
+    $("#addCustomType").click(function() {
+        addToRecipe({ 
+            action: "type", 
+            selector: $("#customTypeSelector").val(), 
+            text: $("#customTypeText").val(), 
+            pressEnter: $("#customTypePressEnter").prop("checked"),
+        }); 
+    });
+
+    $("#addCustomNumber").click(function() {
+        addToRecipe({ action: "number", selector: $("#customNumberSelector").val() }); 
+    });
     
     prepareUi();
 };

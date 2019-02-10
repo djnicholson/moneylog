@@ -66,14 +66,48 @@
             <div class="col-4">
                 <h3>Click something&hellip;</h3>
                 <div id="clickables"></div>
+                <div class="-typable row">
+                    <div class="col-12">
+                        <div class="row">
+                            <input type="text" id="customClickSelector" class="-selector col-12" placeholder="Enter a CSS selector"></input>
+                        </div>
+                        <div class="row">
+                            <input type="button" id="addCustomClick" value="Click custom element" />
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-4">
                 <h3>Type something&hellip;</h3>
                 <div id="typables"></div>
+                <div class="-typable row">
+                    <div class="col-12">
+                        <div class="row">
+                            <input type="text" id="customTypeSelector" class="-selector col-6" placeholder="Enter a CSS selector"></input>
+                            <input type="text" id="customTypeText" class="-value col-6" placeholder="Text to type"></input>
+                        </div>
+                        <div class="row">
+                            <label><input id="customTypePressEnter" type="checkbox">Press enter afterwards</label>
+                        </div>
+                        <div class="row">
+                            <input type="button" id="addCustomType" value="Type into custom element" />
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-4">
                 <h3>Extract some data&hellip;</h3>
                 <div id="numbers"></div>
+                <div class="-typable row">
+                    <div class="col-12">
+                        <div class="row">
+                            <input type="text" id="customNumberSelector" class="-selector col-12" placeholder="Enter a CSS selector"></input>
+                        </div>
+                        <div class="row">
+                            <input type="button" id="addCustomNumber" value="Extract number from custom element" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div>
@@ -120,7 +154,7 @@
             <div class="col-12">
                 <div class="row">
                     <div class="-selector col-5"></div>
-                    <input type="text" class="-value col-7"></input>
+                    <input type="text" class="-value col-7" placeholder="Text to type"></input>
                 </div>
                 <div class="row">
                     <label><input class="-press-enter" type="checkbox">Press enter afterwards</label>
