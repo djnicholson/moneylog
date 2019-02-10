@@ -33,12 +33,67 @@
             code when moneylog tries to check your balance in the future.
         </div>
         <div>
-            Get to the stage where you can see your balance on screen, and then click "Next".
+            Once you have logged in, click "Next".
         </div>
         <div>
             <input type="submit" value="Next" />
         </div>
     </form>
+
+    <form id="recordingIntro" class="-step-2">
+        <div>
+            Ok, now we're going to record the steps that you take to login to this site.
+            Click the "Next" button to load a new instance of this website, then answer the step-by-step
+            questions to describe how you login to the site&hellip;
+        </div>
+        <div>
+            <input type="submit" value="Next" />
+        </div>
+    </form>
+
+    <form id="recording" class="-step-3">
+        <div>
+            What is the next action to take to login to this site?
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <h2>Click something&hellip;</h2>
+                <ul id="clickables">
+                </ul>
+            </div>
+            <div class="col-4">
+                <h2>Type something&hellip;</h2>
+                <ul id="typables">
+                </ul>
+            </div>
+            <div class="col-4">
+                <h2>Extract some data&hellip;</h2>
+                <ul id="numbers">
+                </ul>
+            </div>
+        </div>
+    </form>
+
+    <script id="template-clickable" type="text/x-template">
+        <div>
+            <span class="-id"></span>
+            <span class="-value"></span>
+        </div>
+    </script>
+
+    <script id="template-typable" type="text/x-template">
+        <div>
+            <span class="-id"></span>
+            <span class="-value"></span>
+        </div>
+    </script>
+
+    <script id="template-number" type="text/x-template">
+        <div>
+            <span class="-id"></span>
+            <span class="-value"></span>
+        </div>
+    </script>
 
     <script src="../js_renderer/_all.js"></script>
     <script src="../js_renderer/_newconnection.js"></script>
