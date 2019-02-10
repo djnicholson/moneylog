@@ -15,14 +15,14 @@
         cursor: pointer;
     }
 
-    .-id, .-value {
+    .-selector, .-value {
         @extend .p-1;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .-id {
+    .-selector {
         font-family: monospace;
         font-size: 0.9em;
         font-weight: bold;
