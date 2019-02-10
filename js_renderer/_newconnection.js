@@ -204,6 +204,7 @@ document.body.onload = function() {
 
     moneylog.ipc.on("scraper-result", function(_, data) {
         if (data.id === scraperId && step == 5) {
+            closeScraperIfOpen();
             step = 6;
             result = data.result;
             prepareUi();
