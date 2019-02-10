@@ -57,10 +57,14 @@ module.exports = {
         session.defaultSession.webRequest.onBeforeRequest({ urls: [ CALLBACK_URL + '*' ] }, function(details, callback) {
             var authResponseToken = details.url.split("authResponse=")[1].split("&")[0];
             callback({ cancel: true });
+            processAuthenticationResponse(authResponseToken);
             loginWindow && loginWindow.hide();
             loginWindow = undefined;
-            processAuthenticationResponse(authResponseToken);
         });
+    },
+
+    isAuthenticated: function() {
+        return blockstack.isUserSignedIn();
     },
 
     queryAuthenticationState: function() {
