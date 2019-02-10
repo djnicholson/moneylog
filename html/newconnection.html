@@ -57,41 +57,51 @@
         </div>
         <div class="row">
             <div class="col-4">
-                <h2>Click something&hellip;</h2>
-                <ul id="clickables">
-                </ul>
+                <h3>Click something&hellip;</h3>
+                <div id="clickables"></div>
             </div>
             <div class="col-4">
-                <h2>Type something&hellip;</h2>
-                <ul id="typables">
-                </ul>
+                <h3>Type something&hellip;</h3>
+                <div id="typables"></div>
             </div>
             <div class="col-4">
-                <h2>Extract some data&hellip;</h2>
-                <ul id="numbers">
-                </ul>
+                <h3>Extract some data&hellip;</h3>
+                <div id="numbers"></div>
             </div>
+        </div>
+        <div>
+            <input type="reset" value="Start again" />
         </div>
     </form>
 
     <script id="template-clickable" type="text/x-template">
-        <div>
-            <span class="-id"></span>
-            <span class="-value"></span>
+        <div class="-clickable row">
+            <div class="-id col-5"></div>
+            <div class="-value col-7"></div>
         </div>
     </script>
 
     <script id="template-typable" type="text/x-template">
-        <div>
-            <span class="-id"></span>
-            <span class="-value"></span>
+        <div class="-typable row">
+            <div class="col-12">
+                <div class="row">
+                    <div class="-id col-5"></div>
+                    <input type="text" class="-value col-7"></input>
+                </div>
+                <div class="row">
+                    <label><input class="-press-enter" type="checkbox">Press enter afterwards</label>
+                </div>
+                <div class="row">
+                    <input type="button" class="-add-to-recipe" value="Add" />
+                </div>
+            </div>
         </div>
     </script>
 
     <script id="template-number" type="text/x-template">
-        <div>
-            <span class="-id"></span>
-            <span class="-value"></span>
+        <div class="-number row">
+            <div class="-id col-5"></div>
+            <div class="-value col-7"></div>
         </div>
     </script>
 

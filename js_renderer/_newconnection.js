@@ -4,6 +4,7 @@ var scraperId = null;
 var url = null;
 var step = 0;
 var extractedData = null;
+var recipe = [ ];
 
 var prepareUi = function() {
     for (var i = 0; i < MAX_STEP; i++) {
@@ -47,6 +48,7 @@ var loadScraper = function() {
     url = $("input[type=url]").val();
     scraperId = moneylog.ipc.openScraper(url);
     step = 1;
+    recipe = [];
     prepareUi();
     return false; // prevent form submission
 };
@@ -54,6 +56,7 @@ var loadScraper = function() {
 var loginTestDone = function() {
     closeScraperIfOpen();
     step = 2;
+    recipe = [];
     prepareUi();
     return false; // prevent form submission
 };
@@ -68,7 +71,7 @@ var optionClickable = function(item) {
 var optionTypable = function(item) {
     var element = $($("#template-typable").html());
     element.find(".-id").text(item.id);
-    element.find(".-value").text(item.value);
+    element.find(".-value").attr("placeholder", item.value);
     return element;
 };
 
@@ -83,6 +86,7 @@ var startRecording = function() {
     closeScraperIfOpen();
     scraperId = moneylog.ipc.openScraper(url);
     step = 3;
+    recipe = [];
     prepareUi();
     return false; // prevent form submission
 };
@@ -105,6 +109,7 @@ document.body.onload = function() {
     moneylog.ipc.on("scraper-data", function(_, data) {
         if (data.id === scraperId) {
             extractedData = data.data;
+            console.log(extractedData);
             prepareUi();
         }
     });
@@ -112,6 +117,7 @@ document.body.onload = function() {
     $("#urlEntry").submit(loadScraper);
     $("#loginTest").submit(loginTestDone);
     $("#recordingIntro").submit(startRecording);
+    $("#recording").on("reset", startRecording);
     
     prepareUi();
 };

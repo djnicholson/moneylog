@@ -1,3 +1,31 @@
 .-faded {
     opacity: 0.5;
 }
+
+#recording {
+
+    .-clickable, .-typable, .-number {
+        @extend .shadow;
+        @extend .m-1;
+        background-color: $colorB;
+    }
+
+    .-clickable, .-number {
+        @extend .no-gutters;
+        cursor: pointer;
+    }
+
+    .-id, .-value {
+        @extend .p-1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .-id {
+        font-family: monospace;
+        font-size: 0.9em;
+        font-weight: bold;
+        color: $colorC;
+    }
+}

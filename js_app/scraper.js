@@ -103,7 +103,6 @@ module.exports = {
                 const oldHash = allWindows[thisId].extractedDataHash;
                 allWindows[thisId].extractedDataHash = crypto.createHash('sha256').update(JSON.stringify(extractedData)).digest('hex');
                 if (oldHash != allWindows[thisId].extractedDataHash) {
-                    console.log((new Date), "Extracted data", extractedData);
                     ipc.scraperData(thisId, allWindows[thisId].extractedData);
                 }
             });
