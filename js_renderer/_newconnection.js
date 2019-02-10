@@ -115,9 +115,9 @@ var startTesting = function() {
 var templates = {
     optionClickable: function(item) {
         var element = $($("#template-clickable").html());
-        element.find(".-id").text(item.id);
+        element.find(".-selector").text(item.selector);
         element.find(".-value").text(item.value);
-        element.click(function() { addToRecipe({ action: "click", id: item.id, value: item.value }); });
+        element.click(function() { addToRecipe({ action: "click", selector: item.selector, value: item.value }); });
         return element;
     },
 
@@ -126,10 +126,10 @@ var templates = {
         var submit = function() { 
             var text = element.find("input[type=text]").val();
             var pressEnter = element.find("input[type=checkbox]").prop("checked");
-            addToRecipe({ action: "type", id: item.id, text: text, pressEnter: pressEnter }); 
+            addToRecipe({ action: "type", selector: item.selector, text: text, pressEnter: pressEnter }); 
         };
 
-        element.find(".-id").text(item.id);
+        element.find(".-selector").text(item.selector);
         element.find(".-value").attr("placeholder", item.value);
         element.find(".-value").keypress(function(e) {
             if (e.keyCode == '13') {
@@ -143,10 +143,10 @@ var templates = {
 
     optionNumber: function(item) {
         var element = $($("#template-number").html());
-        element.find(".-id").text(item.id);
+        element.find(".-selector").text(item.selector);
         element.find(".-value").text(item.value);
         element.click(function() { 
-            addToRecipe({ action: "number", id: item.id }); 
+            addToRecipe({ action: "number", selector: item.selector }); 
             showTestInto();
         });
         return element;
@@ -157,16 +157,16 @@ var templates = {
     },
 
     recipeClick: function(recipeItem) {
-        return $("<li>").text("Click on " + recipeItem.id + " (" + recipeItem.value + ")");
+        return $("<li>").text("Click on " + recipeItem.selector + " (" + recipeItem.value + ")");
     },
 
     recipeType: function(recipeItem) {
         var pressEnter = recipeItem.pressEnter ? " then press enter" : "";
-        return $("<li>").text("Type '" + recipeItem.text + "' into " + recipeItem.id + pressEnter);
+        return $("<li>").text("Type '" + recipeItem.text + "' into " + recipeItem.selector + pressEnter);
     },
 
     recipeNumber: function(recipeItem) {
-        return $("<li>").text("Extract numerical value from " + recipeItem.id);
+        return $("<li>").text("Extract numerical value from " + recipeItem.selector);
     },
 };
 
