@@ -22,6 +22,8 @@ const { ipcRenderer } = require('electron');
 
         queryAuthenticationState: function() { send("authentication-query", ""); },
 
+        scraperExtractNumbers: function(scraperId) { return sendSync("scraper-extract-numbers", scraperId); },
+
         signOut: function() { send("authentication-signout", ""); },
 
         startAuthentication: function() { send("authentication-start", ""); },
