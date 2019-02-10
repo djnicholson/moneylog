@@ -1,4 +1,4 @@
-var MAX_STEP = 4;
+var NUM_STEPS = 6;
 
 var scraperId = null;
 var url = null;
@@ -38,36 +38,8 @@ var loginTestDone = function() {
     return false; // prevent form submission
 };
 
-var optionClickable = function(item) {
-    var element = $($("#template-clickable").html());
-    element.find(".-id").text(item.id);
-    element.find(".-value").text(item.value);
-    element.click(function() { addToRecipe({ action: "click", id: item.id, value: item.value }); });
-    return element;
-};
-
-var optionTypable = function(item) {
-    var element = $($("#template-typable").html());
-    element.find(".-id").text(item.id);
-    element.find(".-value").attr("placeholder", item.value);
-    element.find("button").click(function() { 
-        var text = element.find("input[type=text]").val();
-        var pressEnter = element.find("input[type=checkbox]").prop("checked");
-        addToRecipe({ action: "type", id: item.id, text: text, pressEnter: pressEnter }); 
-    });
-    return element;
-};
-
-var optionNumber = function(item) {
-    var element = $($("#template-number").html());
-    element.find(".-id").text(item.id);
-    element.find(".-value").text(item.value);
-    element.click(function() { addToRecipe({ action: "extracxt", id: item.id }); });
-    return element;
-};
-
 var prepareUi = function() {
-    for (var i = 0; i < MAX_STEP; i++) {
+    for (var i = 0; i < NUM_STEPS; i++) {
         var section = $(".-step-" + i);
         if (step > i) {
             section.addClass("-faded");
@@ -83,7 +55,7 @@ var prepareUi = function() {
     var clickables = $("#clickables");
     var typables = $("#typables");
     var numbers = $("#numbers");
-    var recipeList = $("#recipeList");
+    var recipeList = $(".-recipe-list");
 
     clickables.empty();
     typables.empty();
@@ -91,39 +63,28 @@ var prepareUi = function() {
     recipeList.empty();
 
     if (extractedData) {
-        extractedData.clickables.forEach(item => clickables.append(optionClickable(item)));
-        extractedData.typables.forEach(item => typables.append(optionTypable(item)));
-        extractedData.numbers.forEach(item => numbers.append(optionNumber(item)));
+        extractedData.clickables.forEach(item => clickables.append(templates.optionClickable(item)));
+        extractedData.typables.forEach(item => typables.append(templates.optionTypable(item)));
+        extractedData.numbers.forEach(item => numbers.append(templates.optionNumber(item)));
     }
 
-    recipeList.append(recipeUrl(url));
+    var ended = false;
+    recipeList.append(templates.recipeUrl(url));
     for (var i = 0; i < recipe.length; i++) {
         var recipeItem = recipe[i];
         if (recipeItem.action === "click") {
-            recipeList.append(recipeClick(recipeItem));
+            ended = false;
+            recipeList.append(templates.recipeClick(recipeItem));
         } else if (recipeItem.action === "type") {
-            recipeList.append(recipeType(recipeItem));
-        } else if (recipeItem.action === "extract") {
-            recipeList.append(recipeExtract(recipeItem));
+            ended = false;
+            recipeList.append(templates.recipeType(recipeItem));
+        } else if (recipeItem.action === "number") {
+            ended = true;
+            recipeList.append(templates.recipeNumber(recipeItem));
         }
     }
-};
 
-var recipeUrl = function(gotoUrl) {
-    return $("<li>").text("Navigate to " + gotoUrl);
-};
-
-var recipeClick = function(recipeItem) {
-    return $("<li>").text("Click on " + recipeItem.id + " (" + recipeItem.value + ")");
-};
-
-var recipeType = function(recipeItem) {
-    var pressEnter = recipeItem.pressEnter ? " then press enter" : "";
-    return $("<li>").text("Type '" + recipeItem.text + "'' into " + recipeItem.id + pressEnter);
-};
-
-var recipeExtract = function(recipeItem) {
-    return $("<li>").text("Extract numerical value from " + recipeItem.id);
+    !ended && recipeList.append($("<li>").text("…"));
 };
 
 var startRecording = function() {
@@ -133,6 +94,80 @@ var startRecording = function() {
     recipe = [];
     prepareUi();
     return false; // prevent form submission
+};
+
+var showTestInto = function() {
+    closeScraperIfOpen();
+    step = 4;
+    prepareUi();
+    return false; // prevent form submission
+};
+
+var startTesting = function() {
+    closeScraperIfOpen();
+    scraperId = moneylog.ipc.openScraper(url);
+    moneylog.ipc.scraperRecipe(scraperId, recipe);
+    step = 5;
+    prepareUi();
+    return false; // prevent form submission
+};
+
+var templates = {
+    optionClickable: function(item) {
+        var element = $($("#template-clickable").html());
+        element.find(".-id").text(item.id);
+        element.find(".-value").text(item.value);
+        element.click(function() { addToRecipe({ action: "click", id: item.id, value: item.value }); });
+        return element;
+    },
+
+    optionTypable: function(item) {
+        var element = $($("#template-typable").html());
+        var submit = function() { 
+            var text = element.find("input[type=text]").val();
+            var pressEnter = element.find("input[type=checkbox]").prop("checked");
+            addToRecipe({ action: "type", id: item.id, text: text, pressEnter: pressEnter }); 
+        };
+
+        element.find(".-id").text(item.id);
+        element.find(".-value").attr("placeholder", item.value);
+        element.find(".-value").keypress(function(e) {
+            if (e.keyCode == '13') {
+                submit();
+            }
+        });
+
+        element.find("input[type=button]").click(submit);
+        return element;
+    },
+
+    optionNumber: function(item) {
+        var element = $($("#template-number").html());
+        element.find(".-id").text(item.id);
+        element.find(".-value").text(item.value);
+        element.click(function() { 
+            addToRecipe({ action: "number", id: item.id }); 
+            showTestInto();
+        });
+        return element;
+    },
+
+    recipeUrl: function(gotoUrl) {
+        return $("<li>").text("Navigate to " + gotoUrl);
+    },
+
+    recipeClick: function(recipeItem) {
+        return $("<li>").text("Click on " + recipeItem.id + " (" + recipeItem.value + ")");
+    },
+
+    recipeType: function(recipeItem) {
+        var pressEnter = recipeItem.pressEnter ? " then press enter" : "";
+        return $("<li>").text("Type '" + recipeItem.text + "' into " + recipeItem.id + pressEnter);
+    },
+
+    recipeNumber: function(recipeItem) {
+        return $("<li>").text("Extract numerical value from " + recipeItem.id);
+    },
 };
 
 document.body.onunload = function() {
@@ -162,6 +197,8 @@ document.body.onload = function() {
     $("#loginTest").submit(loginTestDone);
     $("#recordingIntro").submit(startRecording);
     $("#recording").on("reset", startRecording);
+    $("#testing").on("reset", startRecording);
+    $("#testing").submit(startTesting);
     
     prepareUi();
 };
