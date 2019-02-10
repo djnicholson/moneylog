@@ -19,8 +19,8 @@ module.exports = {
         ipcMain.on("scraper-open", (event, url) => { event.returnValue = scraper.newWindow(url); });
     },
 
-    setAuthenticationStatus: function(status) {
-        mainWindow.webContents.send("authentication-set", status)
-    },
+    scraperClosed: function(id) { mainWindow.webContents.send("scraper-closed", id); },
+
+    setAuthenticationStatus: function(status) { mainWindow.webContents.send("authentication-set", status); },
 
 };

@@ -19,7 +19,7 @@ app.on("ready", function() {
 
     moneylogapp.ipc.init(ipcMain, win, moneylogapp.authentication, moneylogapp.scraper);
     moneylogapp.authentication.init(BrowserWindow, session, moneylogapp.ipc);
-    moneylogapp.scraper.init(BrowserWindow, moneylogapp.ipc);
+    moneylogapp.scraper.init(BrowserWindow, session, moneylogapp.ipc);
 
     const initialUrl = moneylogapp.authentication.isAuthenticated() ? "../html/home.html" : "../html/index.html";
     win.loadFile(path.join(__dirname, initialUrl));

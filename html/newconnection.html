@@ -9,13 +9,23 @@
   </head>
   <body>
     
-    <form id="urlEntry">
+    <form id="urlEntry" class="-step-0">
         <div>
             What is the web address you use to check your account balance(s)?
             Be as specific as possible (e.g. use a link to the login page)
         </div>
         <div>
-            <input type="url" />
+            <input type="url" value="https://" />
+        </div>
+        <div>
+            <input type="submit" value="Next" />
+        </div>
+    </form>
+
+    <form id="loginTest" class="-step-1">
+        <div>
+            Great, we've loaded that website in a new window.  First things first&hellip; Please confirm
+            that you can login to your account in this window (we're not recording any credentials yet).
         </div>
         <div>
             <input type="submit" value="Next" />
