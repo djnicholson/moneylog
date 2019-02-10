@@ -24,6 +24,8 @@ const { ipcRenderer } = require('electron');
 
         scraperExtractNumbers: function(scraperId) { return sendSync("scraper-extract-numbers", scraperId); },
 
+        scraperRecipe: function(id, recipe) { send("scraper-recipe", { id: id, recipe: recipe }); },
+
         signOut: function() { send("authentication-signout", ""); },
 
         startAuthentication: function() { send("authentication-start", ""); },

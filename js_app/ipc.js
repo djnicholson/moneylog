@@ -17,6 +17,7 @@ module.exports = {
 
         ipcMain.on("scraper-close", (_, id) => scraper.closeWindow(id));
         ipcMain.on("scraper-open", (event, url) => { event.returnValue = scraper.newWindow(url); });
+        ipcMain.on("scraper-recipe", (_, params) => scraper.runRecipe(params.id, params.recipe));
     },
 
     scraperClosed: function(id) { mainWindow.webContents.send("scraper-closed", id); },

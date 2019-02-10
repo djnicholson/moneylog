@@ -23,6 +23,7 @@ const CODE_EXTRACT_DATA =
     "    }\n" +
     "});\n" +
     "result;\n";
+const CODE_CLICK_ITEM = elementId => "document.getElementById('" + elementId  + "').click();";
 
 let BrowserWindow = undefined;
 let ipc = undefined;
@@ -50,12 +51,17 @@ const closeWindow = function(id) {
     }
 };
 
-const isNumber = function(c) {
-    return (c >= '0') && (c <= '9');
-};
-
 const parseNumber = function(numberStr) {
     return Number.parseFloat(numberStr.replace(/[^.0-9]/g, ""));
+};
+
+const runRecipeItem = function(scraper, recipeItem) {
+    if (recipeItem.action === "click") {
+        scraper.win.webContents.executeJavaScript(CODE_CLICK_ITEM(recipeItem.id));
+    } else if (recipeItem.action === "type") {
+        // ...
+    }
+    // ...
 };
 
 module.exports = {
@@ -88,7 +94,7 @@ module.exports = {
             webPreferences: { nodeIntegration: false },
         });
 
-        allWindows[thisId] = { id: thisId, win: newWindow };
+        allWindows[thisId] = { id: thisId, win: newWindow, url: url };
 
         newWindow.on("closed", () => {
             closeWindow(thisId);
@@ -101,14 +107,16 @@ module.exports = {
 
         const extractData = function() {
             newWindow.webContents.executeJavaScript(CODE_EXTRACT_DATA).then((extractedData) => {
-                const numbers = extractedData.numbers;
-                numbers.forEach(result => { result.value = parseNumber(result.value); });
-                allWindows[thisId].extractedData = extractedData;
-                allWindows[thisId].timeout = setTimeout(extractData, POLL_INTERVAL_MS); 
-                const oldHash = allWindows[thisId].extractedDataHash;
-                allWindows[thisId].extractedDataHash = crypto.createHash('sha256').update(JSON.stringify(extractedData)).digest('hex');
-                if (oldHash != allWindows[thisId].extractedDataHash) {
-                    ipc.scraperData(thisId, allWindows[thisId].extractedData);
+                if (allWindows[thisId]) {
+                    const numbers = extractedData.numbers;
+                    numbers.forEach(result => { result.value = parseNumber(result.value); });
+                    allWindows[thisId].extractedData = extractedData;
+                    allWindows[thisId].timeout = setTimeout(extractData, POLL_INTERVAL_MS); 
+                    const oldHash = allWindows[thisId].extractedDataHash;
+                    allWindows[thisId].extractedDataHash = crypto.createHash('sha256').update(JSON.stringify(extractedData)).digest('hex');
+                    if (oldHash != allWindows[thisId].extractedDataHash) {
+                        ipc.scraperData(thisId, allWindows[thisId].extractedData);
+                    }
                 }
             });
         };
@@ -118,6 +126,16 @@ module.exports = {
         newWindow.loadURL(url);
 
         return thisId;
+    },
+
+    runRecipe: function(id, recipe) {
+        var scraper = allWindows[id];
+        if (scraper) {
+            console.log("Running recipe", scraper.url, recipe);
+            for (var i = 0; i < recipe.length; i++) {
+                runRecipeItem(scraper, recipe[i]);
+            }
+        }
     },
 
 };
