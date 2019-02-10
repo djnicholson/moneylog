@@ -134,11 +134,28 @@
 
     <form id="testResults" class="-step-5">
         <div>
-            Your recipe is running now.
+            Your recipe is running now:
         </div>
         <div>
             <ol class="-recipe-list">
             </ol>
+        </div>
+    </form>
+
+    <form id="saveConnection" class="-step-6">
+        <div class="-success">
+            <div>
+                Your recipe returned the following result:
+                <span class="-result"></span>
+            </div>
+            <div>
+                <input type="reset" value="Go back and start again" />
+                <input type="submit" value="Looks good, save this recipe" />
+            </div>
+        </div>
+        <div class="-failure">
+            <div>Your recipe failed to run</div>
+            <div><input type="reset" value="Go back and start again" /></div>
         </div>
     </form>
 

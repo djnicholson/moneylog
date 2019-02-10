@@ -24,6 +24,8 @@ module.exports = {
 
     scraperData: function(id, data) { mainWindow.webContents.send("scraper-data", { id: id, data: data }); },
 
+    scraperResult: function(id, result) { mainWindow.webContents.send("scraper-result", { id: id, result: result }); },
+
     setAuthenticationStatus: function(status) { mainWindow.webContents.send("authentication-set", status); },
 
 };

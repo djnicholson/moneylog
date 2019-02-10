@@ -69,22 +69,24 @@ const parseNumber = function(numberStr) {
     return Number.parseFloat(numberStr.replace(/[^.0-9]/g, ""));
 };
 
-const runRecipe = function(id, recipe, startIndex) {
+const runRecipe = function(id, recipe, startIndex, lastResult) {
     if (startIndex >= recipe.length) {
-        return Promise.resolve(true);
+        return Promise.resolve(lastResult);
     }
 
     var scraper = allWindows[id];
     if (scraper) {
-        console.log("Running recipe step", startIndex, "on", scraper.url, recipe[startIndex]);
-        runRecipeItem(scraper, recipe[startIndex]).then(success => {
+        console.log("Running recipe step", startIndex, "on", scraper.url, recipe[startIndex].selector);
+        return runRecipeItem(scraper, recipe[startIndex]).then(success => {
             if (success) {
-                return runRecipe(id, recipe, startIndex + 1);
+                return runRecipe(id, recipe, startIndex + 1, success);
             } else {
                 console.log("Recipe failed at step", startIndex, "url:", scraper.url);
                 return Promise.resolve(false);
             }
         });
+    } else {
+        return Promise.resolve(false);
     }
 };
 
@@ -116,7 +118,6 @@ const runRecipeItem = function(scraper, recipeItem) {
 };
 
 const runRecipeWaitForItem = function(win, selector, remainingAttempts) {
-    console.log("Waiting for DOM element", selector, "remainingAttempts:", remainingAttempts);
     return new Promise(function(resolve, reject) {
         if (remainingAttempts <= 0) {
             console.log("DOM element", selector, "not found");
@@ -200,7 +201,7 @@ module.exports = {
     },
 
     runRecipe: function(id, recipeItem) {
-        return runRecipe(id, recipeItem, 0);
+        runRecipe(id, recipeItem, 0, true).then(result => ipc.scraperResult(id, result));
     },
 
 };

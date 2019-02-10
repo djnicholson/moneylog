@@ -1,10 +1,11 @@
-var NUM_STEPS = 6;
+var NUM_STEPS = 7;
 
 var scraperId = null;
 var url = null;
 var step = 0;
 var extractedData = null;
 var recipe = [ ];
+var result = null;
 
 var addToRecipe = function(recipeItem) {
     recipe.push(recipeItem);
@@ -26,6 +27,7 @@ var loadScraper = function() {
     scraperId = moneylog.ipc.openScraper(url);
     step = 1;
     recipe = [];
+    result = null;
     prepareUi();
     return false; // prevent form submission
 };
@@ -34,22 +36,14 @@ var loginTestDone = function() {
     closeScraperIfOpen();
     step = 2;
     recipe = [];
+    result = null;
     prepareUi();
     return false; // prevent form submission
 };
 
 var prepareUi = function() {
     for (var i = 0; i < NUM_STEPS; i++) {
-        var section = $(".-step-" + i);
-        if (step > i) {
-            section.addClass("-faded");
-            section.show();
-        } else if (step === i) {
-            section.removeClass("-faded");
-            section.show();
-        } else {
-            section.hide();
-        }
+        var section = $(".-step-" + i).toggle(step === i);
     }
 
     var clickables = $("#clickables");
@@ -85,6 +79,10 @@ var prepareUi = function() {
     }
 
     !ended && recipeList.append($("<li>").text("…"));
+
+    $(".-success").toggle(!!result);
+    $(".-failure").toggle(!result);
+    $(".-result").text(result);
 };
 
 var startRecording = function() {
@@ -92,6 +90,7 @@ var startRecording = function() {
     scraperId = moneylog.ipc.openScraper(url);
     step = 3;
     recipe = [];
+    result = null;
     prepareUi();
     return false; // prevent form submission
 };
@@ -99,6 +98,7 @@ var startRecording = function() {
 var showTestInto = function() {
     closeScraperIfOpen();
     step = 4;
+    result = null;
     prepareUi();
     return false; // prevent form submission
 };
@@ -108,7 +108,16 @@ var startTesting = function() {
     scraperId = moneylog.ipc.openScraper(url);
     moneylog.ipc.scraperRecipe(scraperId, recipe);
     step = 5;
+    result = null;
     prepareUi();
+    return false; // prevent form submission
+};
+
+var saveConnection = function() {
+    //
+    // TODO
+    //
+
     return false; // prevent form submission
 };
 
@@ -157,16 +166,16 @@ var templates = {
     },
 
     recipeClick: function(recipeItem) {
-        return $("<li>").text("Click on " + recipeItem.selector + " (" + recipeItem.value + ")");
+        return $("<li>").text("Click on '" + recipeItem.selector + "'" + (recipeItem.value ? " (usually labeled " + recipeItem.value + ")" : ""));
     },
 
     recipeType: function(recipeItem) {
-        var pressEnter = recipeItem.pressEnter ? " then press enter" : "";
-        return $("<li>").text("Type '" + recipeItem.text + "' into " + recipeItem.selector + pressEnter);
+        var pressEnter = recipeItem.pressEnter ? " and then press enter" : "";
+        return $("<li>").text("Type '" + recipeItem.text + "' into '" + recipeItem.selector + "'" + pressEnter);
     },
 
     recipeNumber: function(recipeItem) {
-        return $("<li>").text("Extract numerical value from " + recipeItem.selector);
+        return $("<li>").text("Extract numerical value from '" + recipeItem.selector + "'");
     },
 };
 
@@ -193,12 +202,22 @@ document.body.onload = function() {
         }
     });
 
+    moneylog.ipc.on("scraper-result", function(_, data) {
+        if (data.id === scraperId && step == 5) {
+            step = 6;
+            result = data.result;
+            prepareUi();
+        }
+    });
+
     $("#urlEntry").submit(loadScraper);
     $("#loginTest").submit(loginTestDone);
     $("#recordingIntro").submit(startRecording);
     $("#recording").on("reset", startRecording);
     $("#testing").on("reset", startRecording);
     $("#testing").submit(startTesting);
+    $("#saveConnection").on("reset", startRecording);
+    $("#saveConnection").submit(saveConnection);
 
     $("#addCustomClick").click(function() {
         addToRecipe({ action: "click", selector: $("#customClickSelector").val() }); 
