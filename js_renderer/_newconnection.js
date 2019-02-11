@@ -248,6 +248,7 @@ document.body.onload = function() {
 
     $("#addCustomNumber").click(function() {
         addToRecipe({ action: "number", selector: $("#customNumberSelector").val() }); 
+        showTestInto();
     });
     
     prepareUi();
