@@ -62,7 +62,7 @@ const jsEncode = function(str) {
     // TODO
     // 
 
-    return str;
+    return str.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 };
 
 const parseNumber = function(numberStr) {
@@ -77,7 +77,7 @@ const runRecipe = function(id, recipe, startIndex, lastResult) {
     var scraper = allWindows[id];
     if (scraper) {
         console.log("Running recipe step", startIndex, "on", scraper.url, recipe[startIndex].selector);
-        return runRecipeItem(scraper, recipe[startIndex]).then(success => {
+        return runRecipeItem(scraper, recipe[startIndex], lastResult).then(success => {
             if (success) {
                 return runRecipe(id, recipe, startIndex + 1, success);
             } else {
@@ -90,22 +90,22 @@ const runRecipe = function(id, recipe, startIndex, lastResult) {
     }
 };
 
-const runRecipeItem = function(scraper, recipeItem) {
+const runRecipeItem = function(scraper, recipeItem, lastResult) {
     return runRecipeWaitForItem(scraper.win, recipeItem.selector, WAIT_FOR_ITEM_TIMEOUT_S).then(elementExists => {
         if (!elementExists) {
             return false;
         }
 
         if (recipeItem.action === "click") {
-            scraper.win.webContents.executeJavaScript(CODE_CLICK_ITEM(recipeItem.selector));
-            return true;
+            scraper.win.webContents.executeJavaScript(CODE_CLICK_ITEM(recipeItem.selector), true);
+            return lastResult;
         } else if (recipeItem.action === "type") {
-            return scraper.win.webContents.executeJavaScript(CODE_SET_TEXT(recipeItem.selector, recipeItem.text)).then(() => {
+            return scraper.win.webContents.executeJavaScript(CODE_SET_TEXT(recipeItem.selector, recipeItem.text), true).then(() => {
                 if (recipeItem.pressEnter) {
                     scraper.win.webContents.sendInputEvent({ type: "char", keyCode: String.fromCharCode(0x0D) });
                 }
 
-                return true;    
+                return lastResult;    
             });
         } else if (recipeItem.action === "number") {
             return scraper.win.webContents.executeJavaScript(CODE_GET_TEXT(recipeItem.selector)).then(textContent => {

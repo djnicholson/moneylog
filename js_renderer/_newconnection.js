@@ -62,23 +62,23 @@ var prepareUi = function() {
         extractedData.numbers.forEach(item => numbers.append(templates.optionNumber(item)));
     }
 
-    var ended = false;
+    var valueExtracted = false;
     recipeList.append(templates.recipeUrl(url));
     for (var i = 0; i < recipe.length; i++) {
         var recipeItem = recipe[i];
         if (recipeItem.action === "click") {
-            ended = false;
             recipeList.append(templates.recipeClick(recipeItem));
         } else if (recipeItem.action === "type") {
-            ended = false;
             recipeList.append(templates.recipeType(recipeItem));
         } else if (recipeItem.action === "number") {
-            ended = true;
+            valueExtracted = true;
             recipeList.append(templates.recipeNumber(recipeItem));
         }
     }
 
-    !ended && recipeList.append($("<li>").text("…"));
+    if (valueExtracted) {
+        $(".-extraction-column").attr("disabled", true);
+    }
 
     $(".-success").toggle(!!result);
     $(".-failure").toggle(!result);
@@ -169,7 +169,6 @@ var templates = {
         element.find(".-value").text(item.value);
         element.click(function() { 
             addToRecipe({ action: "number", selector: item.selector }); 
-            showTestInto();
         });
         return element;
     },
@@ -228,6 +227,7 @@ document.body.onload = function() {
     $("#loginTest").submit(loginTestDone);
     $("#recordingIntro").submit(startRecording);
     $("#recording").on("reset", startRecording);
+    $("#recording").submit(showTestInto);
     $("#testing").on("reset", startRecording);
     $("#testing").submit(startTesting);
     $("#saveConnection").on("reset", startRecording);
@@ -248,7 +248,6 @@ document.body.onload = function() {
 
     $("#addCustomNumber").click(function() {
         addToRecipe({ action: "number", selector: $("#customNumberSelector").val() }); 
-        showTestInto();
     });
     
     prepareUi();
