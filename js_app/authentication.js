@@ -14,8 +14,13 @@ let loginWindow = undefined;
 
 // Hack to allow Blockstack code to directly use global references to localStorage:
 const localStorage = new LocalStorage("./localstorage_authentication");
-global.window = { localStorage: localStorage };
+const location = { origin: "https://moneylog.app" };
+global.window = { 
+    localStorage: localStorage, 
+    location: location, 
+};
 global.localStorage = localStorage;
+global.location = location;
 
 const processAuthenticationResponse = function(authResponseToken) {
     blockstack.handlePendingSignIn("", authResponseToken).then(profile => {

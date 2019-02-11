@@ -22,6 +22,7 @@ app.on("ready", function() {
     moneylogapp.authentication.init(BrowserWindow, session, moneylogapp.ipc);
     moneylogapp.connections.init(moneylogapp.authentication);
     moneylogapp.ipc.init(ipcMain, win, moneylogapp.authentication, moneylogapp.connections, moneylogapp.scraper);
+    moneylogapp.poller.init(moneylogapp.connections, moneylogapp.scraper);
     moneylogapp.scraper.init(BrowserWindow, win, session, moneylogapp.ipc);
 
     const initialUrl = moneylogapp.authentication.isAuthenticated() ? "../html/home.html" : "../html/index.html";

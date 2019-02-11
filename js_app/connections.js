@@ -8,6 +8,25 @@ module.exports = {
         authentication = authenticationRef;
     },
 
+    /**
+     * Calls the provided  callback on every saved connection object. Returns a promise that resolves
+     * once all callbacks have been invoked. The promise resolves to a number indicating how many 
+     * callback invocatons took place.
+     */
+    listConnections: function(callback) {
+        let allCallbacks = [];
+        return authentication.listFiles(filename => {
+            if (filename.startsWith(CONNECTIONS_FOLDER)) {
+                allCallbacks.push(
+                    authentication.getFile(filename).then(filedata => callback(JSON.parse(filedata))));
+            }
+
+            return true;
+        }).then(() => {
+            return Promise.all(allCallbacks).then(() => Promise.resolve(allCallbacks.length));
+        });
+    },
+
     save: function(connection) {
         connection.file = connection.file.replace(/[^-a-zA-Z0-9.]/, "-");
         return authentication.putFile(

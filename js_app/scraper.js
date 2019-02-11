@@ -154,7 +154,7 @@ module.exports = {
         });
     },
 
-    newWindow: function(url) {
+    newWindow: function(url, hidden) {
         const thisId = nextId++;
 
         const mainWindowBounds = mainWindow.getNormalBounds();
@@ -164,6 +164,7 @@ module.exports = {
             x: mainWindowBounds.x + mainWindowBounds.width,
             y: mainWindowBounds.y,
             webPreferences: { nodeIntegration: false },
+            show: !hidden,
         });
 
         allWindows[thisId] = { id: thisId, win: newWindow, url: url };
@@ -200,8 +201,12 @@ module.exports = {
         return thisId;
     },
 
-    runRecipe: function(id, recipeItem) {
-        runRecipe(id, recipeItem, 0, true).then(result => ipc.scraperResult(id, result));
+    runRecipe: function(id, recipeItem, closeAfterSuccess) {
+        return runRecipe(id, recipeItem, 0, true).then(result => {
+            ipc.scraperResult(id, result);
+            closeAfterSuccess && closeWindow(id);
+            return result;
+        });
     },
 
 };
