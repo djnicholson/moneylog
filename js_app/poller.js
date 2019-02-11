@@ -25,7 +25,7 @@ const pollFromQueue = function() {
         pollConnection(connection, /*hidden*/ true).then(() => {
             setTimeout(pollFromQueue, QUEUE_EVALUATION_INTERVAL_MS);    
         }).catch(e => {
-            console.log("Error polling", connection.file, connection.accountName);
+            console.log("Error polling", connection.file, connection.accountName, e);
             setTimeout(pollFromQueue, QUEUE_EVALUATION_INTERVAL_MS);    
         });
     } else {
@@ -53,6 +53,10 @@ const startSnapshot = function() {
     }).then(count => {
         console.log("Poller connection snapshot complete, connections: ", count);
         lastSnapshot = nextSnapshot;
+        nextSnapshot = undefined;
+        setTimeout(startSnapshot, CONNECTION_POLLING_INTERVAL_MS);
+    }).catch(e => {
+        console.log("Error while enumerating connections", e);
         nextSnapshot = undefined;
         setTimeout(startSnapshot, CONNECTION_POLLING_INTERVAL_MS);
     });

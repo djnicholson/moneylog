@@ -4,6 +4,7 @@ const SCRAPER_WINDOW_WIDTH = 1280;
 const SCRAPER_WINDOW_HEIGHT = 1024;
 const POLL_INTERVAL_MS = 1000;
 const WAIT_FOR_ITEM_TIMEOUT_S = 30;
+const DELAY_BEFORE_CLOSE_MS = 5000;
 const CODE_EXTRACT_DATA = 
     "result = { numbers: [ ], clickables: [ ], typables: [ ] };\n" +
     "document.querySelectorAll('*').forEach(function(element) {\n" +
@@ -55,6 +56,12 @@ const closeWindow = function(id) {
         delete allWindows[id];
         ipc.scraperClosed(id);
     }
+};
+
+const delayPromise = function(duration) {
+    return new Promise(function(resolve, reject){
+        setTimeout(resolve, duration)
+    });
 };
 
 const jsEncode = function(str) {
@@ -203,9 +210,16 @@ module.exports = {
 
     runRecipe: function(id, recipeItem, closeAfterSuccess) {
         return runRecipe(id, recipeItem, 0, true).then(result => {
-            ipc.scraperResult(id, result);
-            closeAfterSuccess && closeWindow(id);
-            return result;
+            if (closeAfterSuccess) {
+                return delayPromise(DELAY_BEFORE_CLOSE_MS).then(() =>
+                { 
+                    ipc.scraperResult(id, result);
+                    return Promise.resolve(result);
+                });
+            } else {
+                ipc.scraperResult(id, result);
+                return Promise.resolve(result);
+            }
         });
     },
 
