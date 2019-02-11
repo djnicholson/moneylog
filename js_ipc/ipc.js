@@ -20,7 +20,7 @@ const { ipcRenderer } = require('electron');
 
         openScraper: function(url) { return sendSync("scraper-open", url); },
 
-        queryAuthenticationState: function() { send("authentication-query", ""); },
+        queryAuthenticationState: function() { return sendSync("authentication-query", ""); },
 
         saveConnection: function(connection) { send("connections-save", connection); },
 

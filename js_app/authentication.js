@@ -22,6 +22,10 @@ global.window = {
 global.localStorage = localStorage;
 global.location = location;
 
+const currentAuthenticationStatus = function() {
+    return blockstack.isUserSignedIn() ? blockstack.loadUserData() : undefined;
+};
+
 const processAuthenticationResponse = function(authResponseToken) {
     blockstack.handlePendingSignIn("", authResponseToken).then(profile => {
         console.log("Logged in", profile.username);
@@ -33,7 +37,7 @@ const processAuthenticationResponse = function(authResponseToken) {
 };
 
 const setAuthenticationStatus = function() {
-    ipc.setAuthenticationStatus(blockstack.isUserSignedIn() ? blockstack.loadUserData() : undefined);
+    ipc.setAuthenticationStatus(currentAuthenticationStatus());
 };
 
 const showLoginWindow = function(authUrl) {
@@ -79,7 +83,7 @@ module.exports = {
     putFile: blockstack.putFile,
 
     queryAuthenticationState: function() {
-        setAuthenticationStatus();
+        return currentAuthenticationStatus();
     },
 
     signOut: function() {

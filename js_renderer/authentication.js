@@ -5,16 +5,18 @@
 
     var isAuthenticated = function() {
         return authState != undefined;
-    }
+    };
 
-    moneylog.ipc.on("authentication-set", function(_, state) {
+    var updateAuthenticationState = function(state) {
         authState = state;
         if (isAuthenticated()) {
             afterAuthentication && afterAuthentication();
         }
-    });
+    };
 
-    moneylog.ipc.queryAuthenticationState();
+    moneylog.ipc.on("authentication-set", function(_, state) { updateAuthenticationState(state); });
+
+    updateAuthenticationState(moneylog.ipc.queryAuthenticationState());
 
     return {
         

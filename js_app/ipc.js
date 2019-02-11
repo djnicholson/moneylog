@@ -14,7 +14,7 @@ module.exports = {
         scraper = scraperRef;
 
         ipcMain.on("authentication-start", authentication.startAuthentication);
-        ipcMain.on("authentication-query", authentication.queryAuthenticationState);
+        ipcMain.on("authentication-query", event => { event.returnValue = authentication.queryAuthenticationState() });
         ipcMain.on("authentication-signout", authentication.signOut);
 
         ipcMain.on("connections-save", (_, connection) => connections.save(connection));
