@@ -50,6 +50,8 @@ const showLoginWindow = function(authUrl) {
 
 module.exports = {
 
+    getFile: blockstack.getFile,
+
     init: function(BrowserWindowRef, session, ipcRef) {
         BrowserWindow = BrowserWindowRef;
         ipc = ipcRef;
@@ -66,6 +68,10 @@ module.exports = {
     isAuthenticated: function() {
         return blockstack.isUserSignedIn();
     },
+
+    listFiles: blockstack.listFiles,
+
+    putFile: blockstack.putFile,
 
     queryAuthenticationState: function() {
         setAuthenticationStatus();

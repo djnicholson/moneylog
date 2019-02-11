@@ -114,11 +114,24 @@ var startTesting = function() {
 };
 
 var saveConnection = function() {
-    //
-    // TODO
-    //
+    var accountName = $("#accountName").val();
+    var connection = {
+        file: suggestFilename(url, accountName),
+        url: url,
+        accountName: accountName,
+        recipe: recipe,
+    };
 
+    moneylog.ipc.saveConnection(connection);
+    window.location.href = "home.html";
     return false; // prevent form submission
+};
+
+var suggestFilename = function(url, accountName) {
+    return url.replace(/https?:\/\//, "").toLowerCase().replace(/[^-a-z0-9A-Z]+/g, "-").substring(0, 20) + "-" +
+        accountName.toLowerCase().replace(/[^-a-z0-9A-Z]+/g, "-").substring(0, 20) + "-" +
+        Math.round(Math.random() * 100000) +
+        ".json";
 };
 
 var templates = {
