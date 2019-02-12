@@ -13,57 +13,51 @@ const Poller = function() {
     this.pollQueue = [];
     this.enumerateConnectionsTimer = undefined;
     this.workQueueTimer = undefined;
-    this.shouldStop = false;
 
     this.stop = function() {
-        this.shouldStop = true;
         this.enumerateConnectionsTimer && clearTimeout(this.enumerateConnectionsTimer);
         this.workQueueTimer && clearTimeout(this.workQueueTimer);
     };
 
     this.enumerateConnections = function() {
-        if (!this.shouldStop) {
-            this.nextSnapshot = [];
-            connections.listConnections(connection => {
-                this.nextSnapshot.push(connection);
-                if (shouldPoll(connection)) {
-                    this.pollQueue.push(connection);
-                }
-            }).then(count => {
-                this.lastSnapshot = this.nextSnapshot;
-                this.nextSnapshot = undefined;
-                this.enumerateConnectionsTimer = setTimeout(
-                    this.enumerateConnections.bind(this),
-                    CONNECTION_POLLING_INTERVAL_MS);
-            }).catch(e => {
-                console.log("Error while enumerating connections", e);
-                this.nextSnapshot = undefined;
-                this.enumerateConnectionsTimer = setTimeout(
-                    this.enumerateConnections.bind(this),
-                    CONNECTION_POLLING_INTERVAL_MS);
-            });
-        }
+        this.nextSnapshot = [];
+        connections.listConnections(connection => {
+            this.nextSnapshot.push(connection);
+            if (shouldPoll(connection)) {
+                this.pollQueue.push(connection);
+            }
+        }).then(count => {
+            this.lastSnapshot = this.nextSnapshot;
+            this.nextSnapshot = undefined;
+            this.enumerateConnectionsTimer = setTimeout(
+                this.enumerateConnections.bind(this),
+                CONNECTION_POLLING_INTERVAL_MS);
+        }).catch(e => {
+            console.log("Error while enumerating connections", e);
+            this.nextSnapshot = undefined;
+            this.enumerateConnectionsTimer = setTimeout(
+                this.enumerateConnections.bind(this),
+                CONNECTION_POLLING_INTERVAL_MS);
+        });
     };
 
     this.pollFromQueue = function() {
-        if (!this.shouldStop) {
-            if (this.pollQueue.length > 0) {
-                const connection = this.pollQueue.pop();
-                pollConnection(connection, /*hidden*/ true).then(() => {
-                    this.workQueueTimer = setTimeout(
-                        this.pollFromQueue.bind(this),
-                        QUEUE_EVALUATION_INTERVAL_MS);
-                }).catch(e => {
-                    console.log("Error polling", connection.file, connection.accountName, e);
-                    this.workQueueTimer = setTimeout(
-                        this.pollFromQueue.bind(this),
-                        QUEUE_EVALUATION_INTERVAL_MS);
-                });
-            } else {
+        if (this.pollQueue.length > 0) {
+            const connection = this.pollQueue.pop();
+            pollConnection(connection, /*hidden*/ true).then(() => {
                 this.workQueueTimer = setTimeout(
                     this.pollFromQueue.bind(this),
                     QUEUE_EVALUATION_INTERVAL_MS);
-            }
+            }).catch(e => {
+                console.log("Error polling", connection.file, connection.accountName, e);
+                this.workQueueTimer = setTimeout(
+                    this.pollFromQueue.bind(this),
+                    QUEUE_EVALUATION_INTERVAL_MS);
+            });
+        } else {
+            this.workQueueTimer = setTimeout(
+                this.pollFromQueue.bind(this),
+                QUEUE_EVALUATION_INTERVAL_MS);
         }
     };
 
