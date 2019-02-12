@@ -232,6 +232,7 @@ document.body.onload = function() {
     $("#testing").submit(startTesting);
     $("#saveConnection").on("reset", startRecording);
     $("#saveConnection").submit(saveConnection);
+    $("#retry").click(showTestInto);
 
     $("#addCustomClick").click(function() {
         addToRecipe({ action: "click", selector: $("#customClickSelector").val() }); 
