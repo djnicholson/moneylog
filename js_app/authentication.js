@@ -9,6 +9,7 @@ const MANIFEST_URL = APP_DOMAIN + "/manifest.json"; // Hosted from: https://gith
 const CALLBACK_URL = APP_DOMAIN + "/auth-intercept";
 
 let BrowserWindow = undefined;
+let app = undefined;
 let ipc = undefined;
 let loginWindow = undefined;
 let poller = undefined;
@@ -83,8 +84,9 @@ module.exports = {
         return userState && userState.poller;
     },
 
-    init: function(BrowserWindowRef, session, ipcRef, pollerRef) {
+    init: function(BrowserWindowRef, session, appRef, ipcRef, pollerRef) {
         BrowserWindow = BrowserWindowRef;
+        app = appRef;
         ipc = ipcRef;
         poller = pollerRef;
         
@@ -111,7 +113,10 @@ module.exports = {
 
     signOut: function() {
         blockstack.signUserOut();
-        setAuthenticationStatus();
+        
+        // Exit the app after a user signs out. This is an easy way of making sure that state doesn't
+        // leak between users GAIA storage when one user signs out and a different user signs in.
+        app.exit();
     },
 
     startAuthentication: function() {
