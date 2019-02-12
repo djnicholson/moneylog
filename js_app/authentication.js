@@ -11,6 +11,9 @@ const CALLBACK_URL = APP_DOMAIN + "/auth-intercept";
 let BrowserWindow = undefined;
 let ipc = undefined;
 let loginWindow = undefined;
+let poller = undefined;
+
+let userState = {};
 
 // Hack to allow Blockstack code to directly use global references to localStorage:
 const localStorage = new LocalStorage("./localstorage_authentication");
@@ -26,6 +29,10 @@ const currentAuthenticationStatus = function() {
     return blockstack.isUserSignedIn() ? blockstack.loadUserData() : undefined;
 };
 
+const isAuthenticated = function() {
+    return blockstack.isUserSignedIn();
+};
+
 const processAuthenticationResponse = function(authResponseToken) {
     blockstack.handlePendingSignIn("", authResponseToken).then(profile => {
         console.log("Logged in", profile.username);
@@ -38,6 +45,17 @@ const processAuthenticationResponse = function(authResponseToken) {
 
 const setAuthenticationStatus = function() {
     ipc.setAuthenticationStatus(currentAuthenticationStatus());
+
+    if (userState && userState.poller) {
+        userState.poller.stop();
+        userState = undefined;
+    }
+
+    if (isAuthenticated()) {
+        userState = {
+            poller: new poller.Poller(),
+        };
+    }
 };
 
 const showLoginWindow = function(authUrl) {
@@ -61,9 +79,14 @@ module.exports = {
 
     getFile: blockstack.getFile,
 
-    init: function(BrowserWindowRef, session, ipcRef) {
+    getPoller: function() {
+        return userState && userState.poller;
+    },
+
+    init: function(BrowserWindowRef, session, ipcRef, pollerRef) {
         BrowserWindow = BrowserWindowRef;
         ipc = ipcRef;
+        poller = pollerRef;
         
         session.defaultSession.webRequest.onBeforeRequest({ urls: [ CALLBACK_URL + '*' ] }, function(details, callback) {
             var authResponseToken = details.url.split("authResponse=")[1].split("&")[0];
@@ -72,11 +95,11 @@ module.exports = {
             loginWindow && loginWindow.hide();
             loginWindow = undefined;
         });
+
+        setAuthenticationStatus();
     },
 
-    isAuthenticated: function() {
-        return blockstack.isUserSignedIn();
-    },
+    isAuthenticated: isAuthenticated,
 
     listFiles: blockstack.listFiles,
 

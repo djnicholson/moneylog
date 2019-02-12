@@ -4,6 +4,12 @@ let scraper = undefined;
 let ipcMain = undefined;
 let mainWindow = undefined;
 
+const send = function(event, args) {
+    if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.send(event, args);
+    }
+};
+
 module.exports = {
 
     init: function(ipcMainRef, mainWindowRef, authenticationRef, connectionsRef, scraperRef) {
@@ -24,12 +30,12 @@ module.exports = {
         ipcMain.on("scraper-recipe", (_, params) => scraper.runRecipe(params.id, params.recipe));
     },
 
-    scraperClosed: function(id) { mainWindow.webContents.send("scraper-closed", id); },
+    scraperClosed: function(id) { send("scraper-closed", id); },
 
-    scraperData: function(id, data) { mainWindow.webContents.send("scraper-data", { id: id, data: data }); },
+    scraperData: function(id, data) { send("scraper-data", { id: id, data: data }); },
 
-    scraperResult: function(id, result) { mainWindow.webContents.send("scraper-result", { id: id, result: result }); },
+    scraperResult: function(id, result) { send("scraper-result", { id: id, result: result }); },
 
-    setAuthenticationStatus: function(status) { mainWindow.webContents.send("authentication-set", status); },
+    setAuthenticationStatus: function(status) { send("authentication-set", status); },
 
 };

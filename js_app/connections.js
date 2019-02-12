@@ -14,6 +14,11 @@ module.exports = {
      * callback invocatons took place.
      */
     listConnections: function(callback) {
+        if (!authentication.isAuthenticated()) {
+            console.log("Attempted to list connections when unauthenticated");
+            return Promise.resolve(0);
+        }
+
         let allCallbacks = [];
         return authentication.listFiles(filename => {
             if (filename.startsWith(CONNECTIONS_FOLDER)) {

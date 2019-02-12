@@ -6,10 +6,75 @@ const RUN_NOW = 0;
 let connections = undefined;
 let scraper = undefined;
 
-let lastSnapshot = undefined;
-let nextSnapshot = undefined;
+const Poller = function() {
+    this.lastSnapshot = undefined;
+    this.nextSnapshot = undefined;
+    this.state = undefined;
+    this.pollQueue = [];
+    this.enumerateConnectionsTimer = undefined;
+    this.workQueueTimer = undefined;
+    this.shouldStop = false;
 
-let pollQueue = [];
+    this.stop = function() {
+        this.shouldStop = true;
+        this.enumerateConnectionsTimer && clearTimeout(this.enumerateConnectionsTimer);
+        this.workQueueTimer && clearTimeout(this.workQueueTimer);
+    };
+
+    this.enumerateConnections = function() {
+        if (!this.shouldStop) {
+            this.nextSnapshot = [];
+            connections.listConnections(connection => {
+                this.nextSnapshot.push(connection);
+                if (shouldPoll(connection)) {
+                    this.pollQueue.push(connection);
+                }
+            }).then(count => {
+                this.lastSnapshot = this.nextSnapshot;
+                this.nextSnapshot = undefined;
+                this.enumerateConnectionsTimer = setTimeout(
+                    this.enumerateConnections.bind(this),
+                    CONNECTION_POLLING_INTERVAL_MS);
+            }).catch(e => {
+                console.log("Error while enumerating connections", e);
+                this.nextSnapshot = undefined;
+                this.enumerateConnectionsTimer = setTimeout(
+                    this.enumerateConnections.bind(this),
+                    CONNECTION_POLLING_INTERVAL_MS);
+            });
+        }
+    };
+
+    this.pollFromQueue = function() {
+        if (!this.shouldStop) {
+            if (this.pollQueue.length > 0) {
+                const connection = this.pollQueue.pop();
+                pollConnection(connection, /*hidden*/ true).then(() => {
+                    this.workQueueTimer = setTimeout(
+                        this.pollFromQueue.bind(this),
+                        QUEUE_EVALUATION_INTERVAL_MS);
+                }).catch(e => {
+                    console.log("Error polling", connection.file, connection.accountName, e);
+                    this.workQueueTimer = setTimeout(
+                        this.pollFromQueue.bind(this),
+                        QUEUE_EVALUATION_INTERVAL_MS);
+                });
+            } else {
+                this.workQueueTimer = setTimeout(
+                    this.pollFromQueue.bind(this),
+                    QUEUE_EVALUATION_INTERVAL_MS);
+            }
+        }
+    };
+
+    this.enumerateConnectionsTimer = setTimeout(
+        this.enumerateConnections.bind(this),
+        RUN_NOW);
+
+    this.workQueueTimer = setTimeout(
+        this.pollFromQueue.bind(this),
+        RUN_NOW);
+};
 
 const pollConnection = function(connection, hidden) {
     console.log("Polling", connection.file, connection.accountName);
@@ -17,20 +82,6 @@ const pollConnection = function(connection, hidden) {
     return scraper.runRecipe(scraperId, connection.recipe, /*closeAfterSuccess*/ true).then(result => {
         console.log("Polling", connection.file, connection.accountName, "result", result);
     });
-}
-
-const pollFromQueue = function() {
-    if (pollQueue.length > 0) {
-        const connection = pollQueue.pop();
-        pollConnection(connection, /*hidden*/ true).then(() => {
-            setTimeout(pollFromQueue, QUEUE_EVALUATION_INTERVAL_MS);    
-        }).catch(e => {
-            console.log("Error polling", connection.file, connection.accountName, e);
-            setTimeout(pollFromQueue, QUEUE_EVALUATION_INTERVAL_MS);    
-        });
-    } else {
-        setTimeout(pollFromQueue, QUEUE_EVALUATION_INTERVAL_MS);
-    }
 };
 
 const shouldPoll = function(connection) {
@@ -41,38 +92,13 @@ const shouldPoll = function(connection) {
     return true;
 };
 
-const startSnapshot = function() {
-    console.log("Poller is starting a new connection snapshot");
-    nextSnapshot = [];
-    connections.listConnections(connection => {
-        console.log("Poller connection snapshot received: ", connection.file, connection.accountName);
-        nextSnapshot.push(connection);
-        if (shouldPoll(connection)) {
-            pollQueue.push(connection);
-        }
-    }).then(count => {
-        console.log("Poller connection snapshot complete, connections: ", count);
-        lastSnapshot = nextSnapshot;
-        nextSnapshot = undefined;
-        setTimeout(startSnapshot, CONNECTION_POLLING_INTERVAL_MS);
-    }).catch(e => {
-        console.log("Error while enumerating connections", e);
-        nextSnapshot = undefined;
-        setTimeout(startSnapshot, CONNECTION_POLLING_INTERVAL_MS);
-    });
-};
-
 module.exports = {
 
-    getConnections: function() {
-        return lastSnapshot;
-    },
+    Poller: Poller,
 
     init: function(connectionsRef, scraperRef) {
         connections = connectionsRef;
         scraper = scraperRef;
-        setTimeout(startSnapshot, RUN_NOW);
-        setTimeout(pollFromQueue, RUN_NOW);
     },
 
 };
