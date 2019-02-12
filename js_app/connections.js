@@ -33,7 +33,7 @@ module.exports = {
     },
 
     save: function(connection) {
-        connection.file = connection.file.replace(/[^-a-zA-Z0-9.]/g, "-");
+        connection.file = connection.file.replace(/[^-a-zA-Z0-9.]+/g, "-");
         return authentication.putFile(
             CONNECTIONS_FOLDER + connection.file,
             JSON.stringify(connection)).then(() => {
