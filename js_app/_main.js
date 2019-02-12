@@ -19,8 +19,9 @@ app.on("ready", function() {
         win = null;
     });
 
-    moneylogapp.authentication.init(BrowserWindow, session, app, moneylogapp.ipc, moneylogapp.poller);
+    moneylogapp.authentication.init(BrowserWindow, session, app, moneylogapp.ipc, moneylogapp.data, moneylogapp.poller);
     moneylogapp.connections.init(moneylogapp.authentication);
+    moneylogapp.data.init(moneylogapp.authentication);
     moneylogapp.ipc.init(ipcMain, win, moneylogapp.authentication, moneylogapp.connections, moneylogapp.scraper);
     moneylogapp.poller.init(moneylogapp.authentication, moneylogapp.connections, moneylogapp.scraper);
     moneylogapp.scraper.init(BrowserWindow, win, session, moneylogapp.ipc);

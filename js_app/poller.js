@@ -11,7 +11,8 @@ let authentication = undefined;
 let connections = undefined;
 let scraper = undefined;
 
-const Poller = function() {
+const Poller = function(dataAccessor) {
+    this.dataAccessor = dataAccessor;
     this.lastSnapshot = undefined;
     this.nextSnapshot = undefined;
     this.pollQueue = [];
@@ -80,13 +81,17 @@ const Poller = function() {
                             throw Error("No result extracted by scraper");
                         }
 
-                        state[connection.file].lastSuccess = (new Date).getTime();
-                        state[connection.file].result = result;
-                        state[connection.file].failCount = 0;
+                        const timestamp = (new Date).getTime();
+                        return this.dataAccessor.supplyData(connection.file, timestamp, result).then(() => {
+                            state[connection.file].lastSuccess = timestamp;
+                            state[connection.file].result = result;
+                            state[connection.file].failCount = 0;
+                        });
                     }).catch(e => {
                         console.log("Error polling", connection.file, connection.accountName, e);
                         state[connection.file].lastFail = (new Date).getTime();
                         state[connection.file].failCount++;
+                        return Promise.resolve();
                     });
                 } else {
                     console.log("Skipping poll of", connection.file);
