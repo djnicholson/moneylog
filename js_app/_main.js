@@ -22,7 +22,7 @@ app.on("ready", function() {
     moneylogapp.authentication.init(BrowserWindow, session, app, moneylogapp.ipc, moneylogapp.poller);
     moneylogapp.connections.init(moneylogapp.authentication);
     moneylogapp.ipc.init(ipcMain, win, moneylogapp.authentication, moneylogapp.connections, moneylogapp.scraper);
-    moneylogapp.poller.init(moneylogapp.connections, moneylogapp.scraper);
+    moneylogapp.poller.init(moneylogapp.authentication, moneylogapp.connections, moneylogapp.scraper);
     moneylogapp.scraper.init(BrowserWindow, win, session, moneylogapp.ipc);
 
     const initialUrl = moneylogapp.authentication.isAuthenticated() ? "../html/home.html" : "../html/index.html";
@@ -30,5 +30,3 @@ app.on("ready", function() {
 });
 
 app.on("window-all-closed", app.quit);
-
-

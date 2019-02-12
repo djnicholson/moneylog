@@ -116,7 +116,7 @@ module.exports = {
         
         // Exit the app after a user signs out. This is an easy way of making sure that state doesn't
         // leak between users GAIA storage when one user signs out and a different user signs in.
-        app.exit();
+        app.quit();
     },
 
     startAuthentication: function() {
