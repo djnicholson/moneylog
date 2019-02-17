@@ -1,10 +1,10 @@
 const CONNECTION_POLLING_INTERVAL_MINUTES = 10; // Look for new connections once every 10 minutes
 const CONNECTION_POLLING_INTERVAL_MS = 1000 * 60 * CONNECTION_POLLING_INTERVAL_MINUTES;
 const QUEUE_EVALUATION_INTERVAL_MS = 5000;
-const POLL_INTERVAL_MINUTES = 180; // Poll each connection once per 3 hours
+const POLL_INTERVAL_MINUTES = 1;// 180; // Poll each connection once per 3 hours
 const POLL_INTERVAL_MS = 1000 * 60 * POLL_INTERVAL_MINUTES;
 const RUN_NOW = 0;
-const POLLER_FOLDER = "poller/";
+const POLLER_FOLDER = "poller_v2/";
 const MAX_CONSECUTIVE_FAILS = 3; // Repeat failed scrapes 3 times in a row (delaying CONNECTION_POLLING_INTERVAL in-between attempts)
 
 let authentication = undefined;
