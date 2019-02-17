@@ -1,4 +1,4 @@
-const DATA_FOLDER = "data_v2/";
+const DATA_FOLDER = "data_v3/";
 
 let authentication = undefined;
 

@@ -1,4 +1,4 @@
-const CONNECTIONS_FOLDER = "connections/";
+const CONNECTIONS_FOLDER = "connections_v3/";
 
 let authentication = undefined;
 

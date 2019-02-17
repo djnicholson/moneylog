@@ -4,7 +4,7 @@ const QUEUE_EVALUATION_INTERVAL_MS = 5000;
 const POLL_INTERVAL_MINUTES = 1;// 180; // Poll each connection once per 3 hours
 const POLL_INTERVAL_MS = 1000 * 60 * POLL_INTERVAL_MINUTES;
 const RUN_NOW = 0;
-const POLLER_FOLDER = "poller_v2/";
+const POLLER_FOLDER = "poller_v3/";
 const MAX_CONSECUTIVE_FAILS = 3; // Repeat failed scrapes 3 times in a row (delaying CONNECTION_POLLING_INTERVAL in-between attempts)
 
 let authentication = undefined;

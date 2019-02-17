@@ -1,5 +1,6 @@
 let authentication = undefined;
 let connections = undefined;
+let runner = undefined;
 let scraper = undefined;
 let ipcMain = undefined;
 let mainWindow = undefined;
@@ -12,11 +13,12 @@ const send = function(event, args) {
 
 module.exports = {
 
-    init: function(ipcMainRef, mainWindowRef, authenticationRef, connectionsRef, scraperRef) {
+    init: function(ipcMainRef, mainWindowRef, authenticationRef, connectionsRef, runnerRef, scraperRef) {
         ipcMain = ipcMainRef;
         mainWindow = mainWindowRef;
         authentication = authenticationRef;
         connections = connectionsRef;
+        runner = runnerRef;
         scraper = scraperRef;
 
         ipcMain.on("authentication-start", authentication.startAuthentication);
@@ -28,7 +30,11 @@ module.exports = {
         ipcMain.on("scraper-close", (_, id) => scraper.closeWindow(id));
         ipcMain.on("scraper-open", (event, url) => { event.returnValue = scraper.newWindow(url); });
         ipcMain.on("scraper-recipe", (_, params) => scraper.runRecipe(params.id, params.recipe));
+
+        ipcMain.on("runner-test", (_, params) => runner.test(params.model, params.newSession));
     },
+
+    runnerResult: function(result) { send("runner-result", result); },
 
     scraperClosed: function(id) { send("scraper-closed", id); },
 
