@@ -3,7 +3,7 @@ const { app, session, BrowserWindow, ipcMain } = require("electron");
 const moneylogapp = require("./_moneylogapp");
 
 app.on("ready", function() {
-    let win = new BrowserWindow({ 
+    const win = new BrowserWindow({ 
         width: 1024, 
         height: 768, 
         x: 50,
@@ -18,6 +18,9 @@ app.on("ready", function() {
     win.on("closed", () => {
         win = null;
     });
+
+    // Keep window on top of puppeteer window whilst editing scripts:
+    win.webContents.on("will-navigate", (event, url) => win.setAlwaysOnTop(url.endsWith("/editconnection.html")));
 
     moneylogapp.authentication.init(BrowserWindow, session, app, moneylogapp.ipc, moneylogapp.data, moneylogapp.poller);
     moneylogapp.connections.init(moneylogapp.authentication);

@@ -6,11 +6,12 @@ document.body.onload = function() {
     };
 
     var dom = {
+        cancelButton: $(".-cancel"),
+        newSessionCheckbox: $(".-new-session"),
         scriptInput: $("textarea"),
+        startTestButton: $(".-start-test"),
         variablesContainer: $(".-variables"),
         variables: function() { return $(".-variable"); },
-        startTestButton: $(".-start-test"),
-        newSessionCheckbox: $(".-new-session"),
     };
 
     var startTest = function() {
@@ -59,6 +60,7 @@ document.body.onload = function() {
 
     dom.scriptInput.on("change", updateModel);
     dom.startTestButton.on("click", startTest);
+    dom.cancelButton.on("click", () => { window.location.href = "home.html"; });
 
     updateView();
 
