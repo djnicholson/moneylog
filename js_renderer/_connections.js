@@ -4,6 +4,12 @@ document.body.onload = function() {
         return "$" + n;
     };
 
+    var renderActionsCell = function(filename) {
+        var cell = $($("#template-actionsCell").html());
+        cell.find(".-edit").click(function() { window.location.href = "editconnection.html#" + filename; });
+        return cell;
+    };
+
     var renderCell = function(contents) {
         var cell = $("<td>");
         cell.text(contents);
@@ -17,6 +23,7 @@ document.body.onload = function() {
         row.append(renderCell(lastSuccess));
         row.append(renderCell(lastAttempt));
         row.append(renderCell(balance));
+        row.append(renderActionsCell(filename));
         return row;
     };
 

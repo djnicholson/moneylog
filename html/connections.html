@@ -17,6 +17,7 @@
                 <th>Last success</th>
                 <th>Last attempt</th>
                 <th>Balance</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +27,12 @@
 
     <div><a href="editconnection.html">Add a connection</a></div>
     <div><a href="home.html">Home</a></div>
+
+    <script id="template-actionsCell" type="text/x-template">
+        <td>
+            <input type="button" class="-edit" value="Edit" />
+        </td>
+    </script>
 
     <script src="../js_renderer/_all.js"></script>
     <script src="../js_renderer/_connections.js"></script>
