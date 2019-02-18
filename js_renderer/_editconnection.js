@@ -1,18 +1,38 @@
 document.body.onload = function() {
 
     var model = {
-        variables: { },
-        script: "page.goto('https://www.example.com/');\n\n//...\n\nresult = 123;",
+        filename: "my-connection",
+        variables: { 
+            username: "john.smith",
+            password: "P@ssword!",
+        },
+        script: "page.goto('https://www.example.com/').then(() => {\n    // ...\n    result = 1;\n});",
     };
 
     var dom = {
         cancelButton: $(".-cancel"),
+        filenameInput: $(".-filename"),
         newSessionCheckbox: $(".-new-session"),
+        saveButton: $(".-save"),
         scriptInput: $("textarea"),
         startTestButton: $(".-start-test"),
         testResult: $(".-test-result"),
         variablesContainer: $(".-variables"),
         variables: function() { return $(".-variable"); },
+    };
+
+    var goHome = function() {
+        window.location.href = "home.html";
+    };
+
+    var save = function() {
+        if (model.filename.length) {
+            moneylog.ipc.saveConnection(model);
+            // TODO: Error handling
+            goHome();
+        } else {
+            alert("You must enter a filename to save this connection");
+        }
     };
 
     var startTest = function() {
@@ -32,6 +52,8 @@ document.body.onload = function() {
         }
 
         model.script = dom.scriptInput.val();
+
+        model.filename = dom.filenameInput.val().replace(/[^-a-zA-Z0-9.]+/g, "-");
     };
 
     var updateModelThenView = function() {
@@ -58,6 +80,8 @@ document.body.onload = function() {
         addVariable("", ""); // blank row for new value
 
         dom.scriptInput.val(model.script);
+
+        dom.filenameInput.val(model.filename);
     };
 
     moneylog.ipc.on("runner-result", (event, result) => {
@@ -65,8 +89,10 @@ document.body.onload = function() {
     });
 
     dom.scriptInput.on("change", updateModel);
+    dom.filenameInput.on("change", updateModelThenView);
     dom.startTestButton.on("click", startTest);
-    dom.cancelButton.on("click", () => { window.location.href = "home.html"; });
+    dom.saveButton.on("click", save);
+    dom.cancelButton.on("click", goHome);
 
     updateView();
 

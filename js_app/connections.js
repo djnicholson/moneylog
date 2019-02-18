@@ -9,9 +9,9 @@ module.exports = {
     },
 
     /**
-     * Calls the provided  callback on every saved connection object. Returns a promise that resolves
+     * Calls the provided callback on every saved connection object. Returns a promise that resolves
      * once all callbacks have been invoked. The promise resolves to a number indicating how many 
-     * callback invocatons took place.
+     * callback invocations took place.
      */
     listConnections: function(callback) {
         if (!authentication.isAuthenticated()) {
@@ -33,9 +33,9 @@ module.exports = {
     },
 
     save: function(connection) {
-        connection.file = connection.file.replace(/[^-a-zA-Z0-9.]+/g, "-");
+        connection.filename = connection.filename.replace(/[^-a-zA-Z0-9.]+/g, "-");
         return authentication.putFile(
-            CONNECTIONS_FOLDER + connection.file,
+            CONNECTIONS_FOLDER + connection.filename,
             JSON.stringify(connection)).then(() => {
                 console.log("Saved connection", connection);
             }).catch(() => {

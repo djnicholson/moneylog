@@ -24,7 +24,7 @@ const { ipcRenderer } = require('electron');
 
         runnerTest: function(model, newSession) { send("runner-test", { model: model, newSession: newSession }) },
 
-        saveConnection: function(connection) { send("connections-save", connection); },
+        saveConnection: function(connection) { return sendSync("connections-save", connection); },
 
         scraperExtractNumbers: function(scraperId) { return sendSync("scraper-extract-numbers", scraperId); },
 
