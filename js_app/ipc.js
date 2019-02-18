@@ -28,6 +28,8 @@ module.exports = {
         ipcMain.on("runner-test", (_, params) => runner.test(params.model, params.newSession));
     },
 
+    pollerConnections: function(connections) { send("poller-connections", connections); },
+
     runnerResult: function(result) { send("runner-result", result); },
 
     setAuthenticationStatus: function(status) { send("authentication-set", status); },

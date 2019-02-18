@@ -9,43 +9,49 @@ const MAX_CONSECUTIVE_FAILS = 3; // Repeat failed scrapes 3 times in a row (dela
 
 let authentication = undefined;
 let connections = undefined;
+let ipc = undefined;
 let runner = undefined;
 
-const Poller = function(dataAccessor) {
-    this.dataAccessor = dataAccessor;
-    this.lastSnapshot = undefined;
-    this.nextSnapshot = undefined;
-    this.pollQueue = [];
-    this.enumerateConnectionsTimer = undefined;
-    this.workQueueTimer = undefined;
+const Poller = function() {
+    let lastSnapshot = undefined;
+    let nextSnapshot = undefined;
+    let pollQueue = [];
+    let enumerateConnectionsTimer = undefined;
+    let workQueueTimer = undefined;
 
-    this.enumerateConnections = function() {
-        this.enumerateConnectionsInner().then(() => {
-            this.enumerateConnectionsTimer = setTimeout(
-                this.enumerateConnections.bind(this),
-                CONNECTION_POLLING_INTERVAL_MS);
+    const broadcastConnections = function() {
+        let toBroadcast = null;
+        if (lastSnapshot) {
+            toBroadcast = {};
+            for (var i = 0; i < lastSnapshot.length; i++) {
+                toBroadcast[lastSnapshot[i].metadata.filename] = { ...lastSnapshot[i].metadata };
+            }
+        }
+
+        ipc.pollerConnections(toBroadcast);
+    };
+
+    const enumerateConnections = function() {
+        enumerateConnectionsInner().then(() => {
+            enumerateConnectionsTimer = setTimeout(enumerateConnections.bind(this), CONNECTION_POLLING_INTERVAL_MS);
         });
     };
 
-    this.enumerateConnectionsInner = function() {
-        this.nextSnapshot = [];
+    const enumerateConnectionsInner = function() {
+        nextSnapshot = [];
         return connections.listConnections(connection => {
-            this.nextSnapshot.push(connection);
-            this.pollQueue.push(connection);
+            nextSnapshot.push(connection);
+            pollQueue.push(connection);
         }).then(count => {
-            this.lastSnapshot = this.nextSnapshot;
-            this.nextSnapshot = undefined;
+            lastSnapshot = nextSnapshot;
+            nextSnapshot = undefined;
         }).catch(e => {
             console.log("Error while enumerating connections", e);
-            this.nextSnapshot = undefined;
+            nextSnapshot = undefined;
         });
     };
 
-    this.getConnections = function() {
-        return this.lastSnapshot;
-    };
-
-    this.operateOnState = function(callback) {
+    const operateOnState = function(callback) {
         const stateFile = POLLER_FOLDER + "state.json";
         return authentication.getFile(stateFile).then(initialStateJson => {
             initialStateJson = initialStateJson || "{}";
@@ -62,39 +68,38 @@ const Poller = function(dataAccessor) {
         });
     };
 
-    this.pollFromQueue = function() {
-        this.pollFromQueueInner().then(() => {
-            this.workQueueTimer = setTimeout(
-                this.pollFromQueue.bind(this),
-                QUEUE_EVALUATION_INTERVAL_MS);
+    const pollFromQueue = function() {
+        pollFromQueueInner().then(() => {
+            workQueueTimer = setTimeout(pollFromQueue.bind(this), QUEUE_EVALUATION_INTERVAL_MS);
         });
     };
 
-    this.pollFromQueueInner = function() {
-        if (this.pollQueue.length > 0) {
-            const connection = this.pollQueue.pop();
-            return this.operateOnState(state => {
-                state[connection.filename] = state[connection.filename] || { lastSuccess: 0, lastFail: 0, result: undefined, failCount: 0 };
-                if (shouldPoll(state[connection.filename], connection)) {
-                    return runner.evaluate(connection).then(result => {
+    const pollFromQueueInner = function() {
+        if (pollQueue.length > 0) {
+            const connection = pollQueue.pop();
+            const filename = connection.metadata.filename;
+            return operateOnState(state => {
+                state[filename] = state[filename] || { lastSuccess: 0, lastFail: 0, result: undefined, failCount: 0 };
+                if (shouldPoll(state[filename])) {
+                    return runner.evaluate(connection.metadata).then(result => {
                         if (typeof result != "number") {
                             throw Error("Invalid result extracted by runner: " + result);
                         }
 
                         const timestamp = (new Date).getTime();
-                        return this.dataAccessor.supplyData(connection.filename, timestamp, result).then(() => {
-                            state[connection.filename].lastSuccess = timestamp;
-                            state[connection.filename].result = result;
-                            state[connection.filename].failCount = 0;
+                        return connection.supplyData(timestamp, result).then(() => {
+                            state[filename].lastSuccess = timestamp;
+                            state[filename].result = result;
+                            state[filename].failCount = 0;
                         });
                     }).catch(e => {
-                        console.log("Error polling", connection.filename, e);
-                        state[connection.filename].lastFail = (new Date).getTime();
-                        state[connection.filename].failCount++;
+                        console.log("Error polling", filename, e);
+                        state[filename].lastFail = (new Date).getTime();
+                        state[filename].failCount++;
                         return Promise.resolve();
                     });
                 } else {
-                    console.log("Skipping poll of", connection.filename);
+                    console.log("Skipping poll of", filename);
                     return Promise.resolve();
                 }
             });
@@ -108,16 +113,11 @@ const Poller = function(dataAccessor) {
         this.workQueueTimer && clearTimeout(this.workQueueTimer);
     };
 
-    this.enumerateConnectionsTimer = setTimeout(
-        this.enumerateConnections.bind(this),
-        RUN_NOW);
-
-    this.workQueueTimer = setTimeout(
-        this.pollFromQueue.bind(this),
-        RUN_NOW);
+    enumerateConnectionsTimer = setTimeout(enumerateConnections.bind(this), RUN_NOW);
+    workQueueTimer = setTimeout(pollFromQueue.bind(this), RUN_NOW);
 };
 
-const shouldPoll = function(state, connection) {
+const shouldPoll = function(state) {
     const currentTime = (new Date).getTime();
     if ((state.lastFail > state.lastSuccess) && (state.failCount < MAX_CONSECUTIVE_FAILS)) {
         return true;
@@ -130,9 +130,10 @@ module.exports = {
 
     Poller: Poller,
 
-    init: function(authenticationRef, connectionsRef, runnerRef) {
+    init: function(authenticationRef, connectionsRef, ipcRef, runnerRef) {
         authentication = authenticationRef;
         connections = connectionsRef;
+        ipc = ipcRef;
         runner = runnerRef;
     },
 

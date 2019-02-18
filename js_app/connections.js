@@ -1,6 +1,26 @@
 const CONNECTIONS_FOLDER = "connections_v3/";
+const DATA_FOLDER = "data_v3/";
 
 let authentication = undefined;
+
+const Connection = function(metadata) {
+    this.metadata = metadata;
+
+    this.supplyData = function(timestamp, value) {
+        const dataFile = DATA_FOLDER + this.metadata.filename;
+        return authentication.getFile(dataFile).then(allDataJson => {
+            allDataJson = allDataJson || "{}";
+            allData = JSON.parse(allDataJson);
+            allData.file = file;
+            allData.readings = allData.readings || [];
+            allData.readings.push([ Math.round(timestamp / 1000), value ]);
+            allData.readings.sort((a, b) => a[0] - b[0]);
+            allDataJson = JSON.stringify(allData);
+            console.log("Updating", dataFile, allData);
+            return authentication.putFile(dataFile, allDataJson);
+        });
+    };
+};
 
 module.exports = {
 
@@ -23,7 +43,7 @@ module.exports = {
         return authentication.listFiles(filename => {
             if (filename.startsWith(CONNECTIONS_FOLDER)) {
                 allCallbacks.push(
-                    authentication.getFile(filename).then(filedata => callback(JSON.parse(filedata))));
+                    authentication.getFile(filename).then(filedata => callback(new Connection(JSON.parse(filedata)))));
             }
 
             return true;

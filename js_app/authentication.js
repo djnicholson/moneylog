@@ -12,7 +12,6 @@ let BrowserWindow = undefined;
 let app = undefined;
 let ipc = undefined;
 let loginWindow = undefined;
-let data = undefined;
 let poller = undefined;
 
 let userState = {};
@@ -54,10 +53,8 @@ const setAuthenticationStatus = function() {
     }
 
     if (isAuthenticated()) {
-        const dataAccessor = new data.DataAccessor();
         userState = {
-            dataAccessor: dataAccessor,
-            poller: new poller.Poller(dataAccessor),
+            poller: new poller.Poller(),
         };
     }
 };
@@ -83,19 +80,14 @@ module.exports = {
 
     getFile: blockstack.getFile,
 
-    getDataAccessor: function() {
-        return userState && userState.dataAccessor;
-    },
-
     getPoller: function() {
         return userState && userState.poller;
     },
 
-    init: function(BrowserWindowRef, session, appRef, ipcRef, dataRef, pollerRef) {
+    init: function(BrowserWindowRef, session, appRef, ipcRef, pollerRef) {
         BrowserWindow = BrowserWindowRef;
         app = appRef;
         ipc = ipcRef;
-        data = dataRef;
         poller = pollerRef;
         
         session.defaultSession.webRequest.onBeforeRequest({ urls: [ CALLBACK_URL + '*' ] }, function(details, callback) {
