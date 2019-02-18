@@ -24,13 +24,11 @@ document.body.onload = function() {
         $("tbody").empty();
         for (var filename in connections) {
             var state = connections[filename].state;
-            if (!lastAttemptTimestamp || (state.lastFail && (state.lastFail > lastAttemptTimestamp))) {
-                lastAttemptTimestamp = state.lastFail;
-            }
-
+            var lastSuccessTimestamp = (state && state.lastSuccess) || 0;
+            var lastFailTimestamp = (state && state.lastFail) || 0;
+            var lastAttemptTimestamp = Math.max(lastSuccessTimestamp, lastFailTimestamp);
             var status = state ? (state.failCount ? "X" : " ") : "?";
-            var lastSuccess = (state && state.lastSuccess) ? unixTimestampToString(state.lastSuccess) : "Never";
-            var lastAttemptTimestamp = state.lastSuccess;
+            var lastSuccess = lastSuccessTimestamp ? unixTimestampToString(lastSuccessTimestamp) : "Never";
             var lastAttempt = lastAttemptTimestamp ? unixTimestampToString(lastAttemptTimestamp) : "Never";
             var balance = state ? (typeof state.result == "number" ? formatNumber(state.result) : " ") : " ";
             $("tbody").append(renderRow(status, filename, lastSuccess, lastAttempt, balance));
