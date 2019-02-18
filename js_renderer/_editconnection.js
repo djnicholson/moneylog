@@ -94,6 +94,12 @@ document.body.onload = function() {
     dom.saveButton.on("click", save);
     dom.cancelButton.on("click", goHome);
 
+    var filename = window.location.hash.substring(1);
+    var connections = moneylog.connections.getConnections();
+    if (connections && connections[filename] && connections[filename].model) {
+        model = connections[filename].model;
+    }
+
     updateView();
 
 };
