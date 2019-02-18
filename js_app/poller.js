@@ -1,7 +1,7 @@
 const CONNECTION_POLLING_INTERVAL_MINUTES = 10; // Look for new connections once every 10 minutes
 const CONNECTION_POLLING_INTERVAL_MS = 1000 * 60 * CONNECTION_POLLING_INTERVAL_MINUTES;
 const QUEUE_EVALUATION_INTERVAL_MS = 5000;
-const POLL_INTERVAL_MINUTES = 180; // Poll each connection once per 3 hours
+const POLL_INTERVAL_MINUTES = 1; // Poll each connection once per 3 hours
 const POLL_INTERVAL_MS = 1000 * 60 * POLL_INTERVAL_MINUTES;
 const RUN_NOW = 0;
 const POLLER_FOLDER = "poller_v3/";
@@ -77,8 +77,8 @@ const Poller = function(dataAccessor) {
                 state[connection.filename] = state[connection.filename] || { lastSuccess: 0, lastFail: 0, result: undefined, failCount: 0 };
                 if (shouldPoll(state[connection.filename], connection)) {
                     return runner.evaluate(connection).then(result => {
-                        if (!result) {
-                            throw Error("No result extracted by runner");
+                        if (typeof result != "number") {
+                            throw Error("Invalid result extracted by runner: " + result);
                         }
 
                         const timestamp = (new Date).getTime();

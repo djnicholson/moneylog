@@ -10,7 +10,7 @@ const DataAccessor = function() {
             allData = JSON.parse(allDataJson);
             allData.file = file;
             allData.readings = allData.readings || [];
-            allData.readings.push([ Math.round(timestamp / 1000), 0.0 + value ]);
+            allData.readings.push([ Math.round(timestamp / 1000), value ]);
             allData.readings.sort((a, b) => a[0] - b[0]);
             allDataJson = JSON.stringify(allData);
             console.log("Updating", dataFile, allData);

@@ -85,7 +85,7 @@ document.body.onload = function() {
     };
 
     moneylog.ipc.on("runner-result", (event, result) => {
-        dom.testResult.text(result ? "Result: " + result : "There was an error running your script");
+        dom.testResult.text(typeof result == "number" ? "Result: " + result : "There was an error running your script, result: " + result);
     });
 
     dom.scriptInput.on("change", updateModel);

@@ -57,6 +57,7 @@ const Runner = function(headless) {
                     }
                 });
             })
+            .then(result => parseFloat(result))
             .then(result => {
                 console.log("result", result);
                 return result;
