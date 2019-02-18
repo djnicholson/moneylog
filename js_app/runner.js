@@ -1,12 +1,20 @@
 const vm = require('vm');
 const puppeteer = require('puppeteer');
+const prompt = require('electron-prompt');
 
 let ipc = undefined;
 
 let testRunner = undefined;
 
+const getInput = function(promptText) {
+    return prompt({
+        title: "User input required",
+        label: promptText,
+    });
+};
+
 const Runner = function(headless) {
-    this.browser = puppeteer.launch({headless: headless, args: ['--disable-infobars'] });
+    this.browser = puppeteer.launch({headless: headless, args: ['--disable-infobars'], defaultViewport: null });
     
     this.dispose = function() {
         return this.browser.then(browser => browser.close());
@@ -19,6 +27,7 @@ const Runner = function(headless) {
                 const variables = {...model.variables};
                 variables.page = page;
                 variables.result = undefined;
+                variables.getInput = getInput;
                 vm.createContext(variables);
                 const p = vm.runInContext(model.script, variables);
                 if (p && p.then) {
@@ -30,6 +39,10 @@ const Runner = function(headless) {
             .then(result => {
                 console.log("result", result);
                 return result;
+            })
+            .catch(e => {
+                console.log("error", e);
+                return null;
             });
     };
 };
@@ -48,10 +61,7 @@ module.exports = {
             testRunner = new Runner(/*headless*/ false);
         }
 
-        testRunner
-            .evaluate(model)
-            .then(result => ipc.runnerResult(result))
-            .catch(e => ipc.runnerResult(undefined));
+        return testRunner.evaluate(model).then(result => ipc.runnerResult(result));
     },
 
 };
