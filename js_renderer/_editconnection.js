@@ -10,12 +10,14 @@ document.body.onload = function() {
         newSessionCheckbox: $(".-new-session"),
         scriptInput: $("textarea"),
         startTestButton: $(".-start-test"),
+        testResult: $(".-test-result"),
         variablesContainer: $(".-variables"),
         variables: function() { return $(".-variable"); },
     };
 
     var startTest = function() {
         moneylog.ipc.runnerTest(model, dom.newSessionCheckbox.prop("checked"));
+        dom.testResult.text("Running script...");
     };
 
     var updateModel = function() {
@@ -57,6 +59,10 @@ document.body.onload = function() {
 
         dom.scriptInput.val(model.script);
     };
+
+    moneylog.ipc.on("runner-result", (event, result) => {
+        dom.testResult.text(result ? "Result: " + result : "There was an error running your script");
+    });
 
     dom.scriptInput.on("change", updateModel);
     dom.startTestButton.on("click", startTest);
