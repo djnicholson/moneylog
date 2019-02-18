@@ -22,7 +22,7 @@ document.body.onload = function() {
     };
 
     var goHome = function() {
-        window.location.href = "home.html";
+        window.location.href = "connections.html";
     };
 
     var save = function() {
