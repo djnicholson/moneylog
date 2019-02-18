@@ -29,7 +29,6 @@ document.body.onload = function() {
         if (model.filename.length) {
             moneylog.ipc.saveConnection(model);
             // TODO: Error handling
-            goHome();
         } else {
             alert("You must enter a filename to save this connection");
         }
