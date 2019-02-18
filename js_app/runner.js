@@ -31,7 +31,7 @@ const Runner = function(headless) {
 
     this.evaluate = function(model) {
         var screenshotOnFailure = function(page, result) {
-            if (!result) {
+            if (!result && page) {
                 const screenshotPath = "/tmp/moneylog-failure.png";
                 console.log("Screenshotting runner failure in", screenshotPath);
                 return page.screenshot({ path: screenshotPath }).then(() => result);
@@ -40,9 +40,11 @@ const Runner = function(headless) {
             }
         };
 
+        let lastKnownPage = undefined;
         return this.browser
             .then(browser => browser.newPage())
             .then(page => {
+                lastKnownPage = page;
                 return page.setUserAgent(this.defaultUserAgent.replace("Headless", "")).then(() => {
                     const variables = {...model.variables};
                     variables.page = page;
@@ -63,8 +65,8 @@ const Runner = function(headless) {
                 return result;
             })
             .catch(e => {
-                console.log("error", e);
-                return null;
+                console.log("Runner evaluation error", e);
+                return screenshotOnFailure(lastKnownPage, null);
             });
     };
 };

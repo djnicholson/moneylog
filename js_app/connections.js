@@ -11,7 +11,7 @@ const Connection = function(metadata) {
         return authentication.getFile(dataFile).then(allDataJson => {
             allDataJson = allDataJson || "{}";
             allData = JSON.parse(allDataJson);
-            allData.file = file;
+            allData.filename = this.metadata.filename;
             allData.readings = allData.readings || [];
             allData.readings.push([ Math.round(timestamp / 1000), value ]);
             allData.readings.sort((a, b) => a[0] - b[0]);
