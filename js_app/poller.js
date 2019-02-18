@@ -5,7 +5,7 @@ const POLL_INTERVAL_MINUTES = 180; // Poll each connection once per 3 hours
 const POLL_INTERVAL_MS = 1000 * 60 * POLL_INTERVAL_MINUTES;
 const RUN_NOW = 0;
 const POLLER_FOLDER = "poller_v3/";
-const MAX_CONSECUTIVE_FAILS = 3; // Repeat failed scrapes 3 times in a row (delaying CONNECTION_POLLING_INTERVAL in-between attempts)
+const MAX_CONSECUTIVE_FAILS = 99; //TODO 3; // Repeat failed scrapes 3 times in a row (delaying CONNECTION_POLLING_INTERVAL in-between attempts)
 
 let authentication = undefined;
 let connections = undefined;
@@ -88,7 +88,7 @@ const Poller = function(dataAccessor) {
                             state[connection.filename].failCount = 0;
                         });
                     }).catch(e => {
-                        console.log("Error polling", connection.file, connection.accountName, e);
+                        console.log("Error polling", connection.filename, e);
                         state[connection.filename].lastFail = (new Date).getTime();
                         state[connection.filename].failCount++;
                         return Promise.resolve();
