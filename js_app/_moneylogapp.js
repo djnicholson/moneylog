@@ -5,5 +5,4 @@ module.exports = {
     ipc: require("./ipc"),
     poller: require("./poller"),
     runner: require("./runner"),
-    scraper: require("./scraper"),
 };

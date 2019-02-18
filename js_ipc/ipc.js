@@ -12,23 +12,15 @@ const { ipcRenderer } = require('electron');
 
     return {
 
-        closeScraper: function(scraperId) { send("scraper-close", scraperId); },
-
         on: function(eventName, handler) {
             ipcRenderer.on(eventName, handler);
         },
-
-        openScraper: function(url) { return sendSync("scraper-open", url); },
 
         queryAuthenticationState: function() { return sendSync("authentication-query", ""); },
 
         runnerTest: function(model, newSession) { send("runner-test", { model: model, newSession: newSession }) },
 
         saveConnection: function(connection) { return sendSync("connections-save", connection); },
-
-        scraperExtractNumbers: function(scraperId) { return sendSync("scraper-extract-numbers", scraperId); },
-
-        scraperRecipe: function(id, recipe) { send("scraper-recipe", { id: id, recipe: recipe }); },
 
         signOut: function() { send("authentication-signout", ""); },
 
