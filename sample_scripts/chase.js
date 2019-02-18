@@ -1,3 +1,11 @@
+//
+// Variables:
+//   - username
+//   - password
+//   - lastFour
+//   - isCredit
+//
+
 delay = 10000;
 page.goto('https://www.chase.com/')
     .then(() => page.$eval(".side-menu .signInBtn", _ => _.href))
