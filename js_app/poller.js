@@ -13,26 +13,16 @@ let ipc = undefined;
 let runner = undefined;
 
 const Poller = function() {
+    let lastState = undefined;
     let lastSnapshot = undefined;
     let nextSnapshot = undefined;
     let pollQueue = [];
     let enumerateConnectionsTimer = undefined;
     let workQueueTimer = undefined;
 
-    const broadcastConnections = function() {
-        let toBroadcast = null;
-        if (lastSnapshot) {
-            toBroadcast = {};
-            for (var i = 0; i < lastSnapshot.length; i++) {
-                toBroadcast[lastSnapshot[i].metadata.filename] = { ...lastSnapshot[i].metadata };
-            }
-        }
-
-        ipc.pollerConnections(toBroadcast);
-    };
-
     const enumerateConnections = function() {
         enumerateConnectionsInner().then(() => {
+            ipc.pollerConnections(this.connections());
             enumerateConnectionsTimer = setTimeout(enumerateConnections.bind(this), CONNECTION_POLLING_INTERVAL_MS);
         });
     };
@@ -56,11 +46,14 @@ const Poller = function() {
         return authentication.getFile(stateFile).then(initialStateJson => {
             initialStateJson = initialStateJson || "{}";
             const state = JSON.parse(initialStateJson);
+            lastState = state;
             return callback.bind(this)(state).then(() => {
                 const newStateJson = JSON.stringify(state);
                 if (newStateJson != initialStateJson) {
                     console.log("Upading poller state", state);
-                    return authentication.putFile(stateFile, newStateJson);
+                    return authentication.putFile(stateFile, newStateJson).then(() => {
+                        lastState = state;
+                    });
                 } else {
                     return Promise.resolve();
                 }
@@ -106,6 +99,23 @@ const Poller = function() {
         } else {
             return Promise.resolve();
         }
+    };
+
+    this.connections = function() {
+        let toBroadcast = null;
+        if (lastSnapshot && lastState) {
+            toBroadcast = {};
+            for (var i = 0; i < lastSnapshot.length; i++) {
+                var filename = lastSnapshot[i].metadata.filename;
+                var stateEntry = lastState[filename] || {};
+                toBroadcast[filename] = {
+                    model: { ...lastSnapshot[i].metadata },
+                    state: { ...stateEntry },
+                };
+            }
+        }
+
+        return toBroadcast;
     };
 
     this.stop = function() {

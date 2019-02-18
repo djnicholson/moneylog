@@ -16,6 +16,8 @@ const { ipcRenderer } = require('electron');
             ipcRenderer.on(eventName, handler);
         },
 
+        authenticationQueryConnections: function() { return sendSync("authentication-query-connections", ""); },
+
         queryAuthenticationState: function() { return sendSync("authentication-query", ""); },
 
         runnerTest: function(model, newSession) { send("runner-test", { model: model, newSession: newSession }) },

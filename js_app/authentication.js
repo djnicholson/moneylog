@@ -30,6 +30,10 @@ const currentAuthenticationStatus = function() {
     return blockstack.isUserSignedIn() ? blockstack.loadUserData() : undefined;
 };
 
+const getPoller = function() {
+    return userState && userState.poller;
+};
+
 const isAuthenticated = function() {
     return blockstack.isUserSignedIn();
 };
@@ -80,9 +84,7 @@ module.exports = {
 
     getFile: blockstack.getFile,
 
-    getPoller: function() {
-        return userState && userState.poller;
-    },
+    getPoller: getPoller,
 
     init: function(BrowserWindowRef, session, appRef, ipcRef, pollerRef) {
         BrowserWindow = BrowserWindowRef;
@@ -109,6 +111,15 @@ module.exports = {
 
     queryAuthenticationState: function() {
         return currentAuthenticationStatus();
+    },
+
+    queryConnections: function() {
+        const poller = getPoller();
+        if (poller) {
+            return poller.connections();
+        } 
+
+        return null;
     },
 
     signOut: function() {

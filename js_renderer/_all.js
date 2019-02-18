@@ -1,5 +1,6 @@
 var allModules = [
     "../js_renderer/authentication.js",
+    "../js_renderer/connections.js",
     "../js_renderer/ui.js",
 ];
 
