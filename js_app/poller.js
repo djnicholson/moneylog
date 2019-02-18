@@ -9,7 +9,7 @@ const MAX_CONSECUTIVE_FAILS = 3; // Repeat failed scrapes 3 times in a row (dela
 
 let authentication = undefined;
 let connections = undefined;
-let scraper = undefined;
+let runner = undefined;
 
 const Poller = function(dataAccessor) {
     this.dataAccessor = dataAccessor;
@@ -74,27 +74,27 @@ const Poller = function(dataAccessor) {
         if (this.pollQueue.length > 0) {
             const connection = this.pollQueue.pop();
             return this.operateOnState(state => {
-                state[connection.file] = state[connection.file] || { lastSuccess: 0, lastFail: 0, result: undefined, failCount: 0 };
-                if (shouldPoll(state[connection.file], connection)) {
-                    return pollConnection(connection, /*hidden*/ true).then(result => {
+                state[connection.filename] = state[connection.filename] || { lastSuccess: 0, lastFail: 0, result: undefined, failCount: 0 };
+                if (shouldPoll(state[connection.filename], connection)) {
+                    return runner.evaluate(connection).then(result => {
                         if (!result) {
-                            throw Error("No result extracted by scraper");
+                            throw Error("No result extracted by runner");
                         }
 
                         const timestamp = (new Date).getTime();
-                        return this.dataAccessor.supplyData(connection.file, timestamp, result).then(() => {
-                            state[connection.file].lastSuccess = timestamp;
-                            state[connection.file].result = result;
-                            state[connection.file].failCount = 0;
+                        return this.dataAccessor.supplyData(connection.filename, timestamp, result).then(() => {
+                            state[connection.filename].lastSuccess = timestamp;
+                            state[connection.filename].result = result;
+                            state[connection.filename].failCount = 0;
                         });
                     }).catch(e => {
                         console.log("Error polling", connection.file, connection.accountName, e);
-                        state[connection.file].lastFail = (new Date).getTime();
-                        state[connection.file].failCount++;
+                        state[connection.filename].lastFail = (new Date).getTime();
+                        state[connection.filename].failCount++;
                         return Promise.resolve();
                     });
                 } else {
-                    console.log("Skipping poll of", connection.file);
+                    console.log("Skipping poll of", connection.filename);
                     return Promise.resolve();
                 }
             });
@@ -117,15 +117,6 @@ const Poller = function(dataAccessor) {
         RUN_NOW);
 };
 
-const pollConnection = function(connection, hidden) {
-    console.log("Polling", connection.file, connection.accountName);
-    const scraperId = scraper.newWindow(connection.url, hidden);
-    return scraper.runRecipe(scraperId, connection.recipe, /*closeAfterSuccess*/ true).then(result => {
-        console.log("Polling", connection.file, connection.accountName, "result", result);
-        return result;
-    });
-};
-
 const shouldPoll = function(state, connection) {
     const currentTime = (new Date).getTime();
     if ((state.lastFail > state.lastSuccess) && (state.failCount < MAX_CONSECUTIVE_FAILS)) {
@@ -139,10 +130,10 @@ module.exports = {
 
     Poller: Poller,
 
-    init: function(authenticationRef, connectionsRef, scraperRef) {
+    init: function(authenticationRef, connectionsRef, runnerRef) {
         authentication = authenticationRef;
         connections = connectionsRef;
-        scraper = scraperRef;
+        runner = runnerRef;
     },
 
 };

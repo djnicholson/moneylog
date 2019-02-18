@@ -53,8 +53,17 @@ module.exports = {
         ipc = ipcRef;
     },
 
+    evaluate: function(model) {
+        console.log("Running", model.filename);
+        const runner = new Runner(/*headless*/ true);
+        return runner.evaluate(model).then(result => {
+            runner.dispose();
+            return result;
+        });
+    },
+
     test: function(model, newSession) {
-        console.log("Testing", model, newSession ? "in a new session" : "");
+        console.log("Testing", model.filename, newSession ? "in a new session" : "");
         
         if (newSession || !testRunner) {
             testRunner && testRunner.dispose();

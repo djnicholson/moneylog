@@ -26,7 +26,7 @@ app.on("ready", function() {
     moneylogapp.connections.init(moneylogapp.authentication);
     moneylogapp.data.init(moneylogapp.authentication);
     moneylogapp.ipc.init(ipcMain, win, moneylogapp.authentication, moneylogapp.connections, moneylogapp.runner, moneylogapp.scraper);
-    moneylogapp.poller.init(moneylogapp.authentication, moneylogapp.connections, moneylogapp.scraper);
+    moneylogapp.poller.init(moneylogapp.authentication, moneylogapp.connections, moneylogapp.runner);
     moneylogapp.runner.init(moneylogapp.ipc);
     moneylogapp.scraper.init(BrowserWindow, win, session, moneylogapp.ipc);
 

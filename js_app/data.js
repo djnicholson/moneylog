@@ -4,7 +4,7 @@ let authentication = undefined;
 
 const DataAccessor = function() {
     this.supplyData = function(file, timestamp, value) {
-        const dataFile = DATA_FOLDER + file + ".data.json";
+        const dataFile = DATA_FOLDER + file;
         return authentication.getFile(dataFile).then(allDataJson => {
             allDataJson = allDataJson || "{}";
             allData = JSON.parse(allDataJson);

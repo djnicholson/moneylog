@@ -46,9 +46,11 @@ page.goto('https://www.chase.com/')
         }
     }, lastFour))
     .then(balance => {
-        result = balance.replace(/[$,]/g, "");
-        if (isCredit == "true" || isCredit == "1") {
-            result *= -1;
+        if (balance) {
+            result = balance.replace(/[$,]/g, "");
+            if (isCredit == "true" || isCredit == "1") {
+                result *= -1;
+            }
         }
     });
 

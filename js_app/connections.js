@@ -37,9 +37,9 @@ module.exports = {
         return authentication.putFile(
             CONNECTIONS_FOLDER + connection.filename,
             JSON.stringify(connection)).then(() => {
-                console.log("Saved connection", connection);
+                console.log("Saved connection", connection.filename);
             }).catch(() => {
-                console.log("Failed to save connection", connection);
+                console.log("Failed to save connection", connection.filename, connection.script);
             });
     },
 
