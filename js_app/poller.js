@@ -13,16 +13,25 @@ let ipc = undefined;
 let runner = undefined;
 
 const Poller = function() {
-    let lastState = undefined;
+    let enumerateConnectionsTimer = undefined;
+    let lastBroadcastJson = undefined;
     let lastSnapshot = undefined;
+    let lastState = undefined;
     let nextSnapshot = undefined;
     let pollQueue = [];
-    let enumerateConnectionsTimer = undefined;
     let workQueueTimer = undefined;
+
+    const broadcast = function(connections) {
+        const connectionsJson = JSON.stringify(connections);
+        if (connectionsJson != lastBroadcastJson) {
+            ipc.pollerConnections(connections);
+            lastBroadcastJson = connectionsJson;
+        }
+    };
 
     const enumerateConnections = function() {
         enumerateConnectionsInner().then(() => {
-            ipc.pollerConnections(this.connections());
+            broadcast(this.connections());
             enumerateConnectionsTimer = setTimeout(enumerateConnections.bind(this), CONNECTION_POLLING_INTERVAL_MS);
         });
     };
@@ -63,6 +72,7 @@ const Poller = function() {
 
     const pollFromQueue = function() {
         pollFromQueueInner().then(() => {
+            broadcast(this.connections());
             workQueueTimer = setTimeout(pollFromQueue.bind(this), QUEUE_EVALUATION_INTERVAL_MS);
         });
     };

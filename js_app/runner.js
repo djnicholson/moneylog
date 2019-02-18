@@ -65,7 +65,7 @@ const Runner = function(headless) {
                 return result;
             })
             .catch(e => {
-                console.log("Runner evaluation error", e);
+                console.log("Runner evaluation error", e ? e.message : "(unknown error)");
                 return screenshotOnFailure(lastKnownPage, null);
             });
     };
