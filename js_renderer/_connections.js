@@ -48,5 +48,7 @@ document.body.onload = function() {
 
     moneylog.connections.onUpdate(renderTable);
     renderTable(moneylog.connections.getConnections());
+
+    $(".-refresh").click(moneylog.ipc.authenticationRefreshConnections);
 };
 

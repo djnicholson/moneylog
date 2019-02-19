@@ -18,6 +18,8 @@ const { ipcRenderer } = require('electron');
 
         authenticationQueryConnections: function() { return sendSync("authentication-query-connections", ""); },
 
+        authenticationRefreshConnections: function() { send("authentication-refresh-connections", ""); },
+
         queryAuthenticationState: function() { return sendSync("authentication-query", ""); },
 
         runnerTest: function(model, newSession) { send("runner-test", { model: model, newSession: newSession }) },

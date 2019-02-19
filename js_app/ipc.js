@@ -22,6 +22,7 @@ module.exports = {
         ipcMain.on("authentication-start", authentication.startAuthentication);
         ipcMain.on("authentication-query", event => { event.returnValue = authentication.queryAuthenticationState() });
         ipcMain.on("authentication-query-connections", event => { event.returnValue = authentication.queryConnections() });
+        ipcMain.on("authentication-refresh-connections", authentication.refreshConnections);
         ipcMain.on("authentication-signout", authentication.signOut);
 
         ipcMain.on("connections-save", (_, connection) => connections.save(connection).then(() => authentication.refreshConnections()));
