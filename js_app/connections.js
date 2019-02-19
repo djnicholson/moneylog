@@ -7,6 +7,10 @@ const Connection = function(metadata) {
     this.metadata = metadata;
 
     this.supplyData = function(timestamp, value) {
+        if ((typeof value != "number") || isNaN(value)) {
+            return Promise.resolve();
+        }
+
         const dataFile = DATA_FOLDER + this.metadata.filename;
         return authentication.getFile(dataFile).then(allDataJson => {
             allDataJson = allDataJson || "{}";

@@ -22,7 +22,7 @@ const { ipcRenderer } = require('electron');
 
         runnerTest: function(model, newSession) { send("runner-test", { model: model, newSession: newSession }) },
 
-        saveConnection: function(connection) { return sendSync("connections-save", connection); },
+        saveConnection: function(connection) { send("connections-save", connection); },
 
         signOut: function() { send("authentication-signout", ""); },
 
