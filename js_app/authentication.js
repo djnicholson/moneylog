@@ -122,6 +122,13 @@ module.exports = {
         return null;
     },
 
+    refreshConnections: function() {
+        const poller = getPoller();
+        if (poller) {
+            return poller.refreshConnections();
+        }
+    },
+
     signOut: function() {
         blockstack.signUserOut();
         

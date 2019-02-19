@@ -128,13 +128,24 @@ const Poller = function() {
         return toBroadcast;
     };
 
+    this.refreshConnections = function() {
+        this.stop();
+        this.start();
+    };
+
+    this.start = function() {
+        enumerateConnectionsTimer = setTimeout(enumerateConnections.bind(this), RUN_NOW);
+        workQueueTimer = setTimeout(pollFromQueue.bind(this), RUN_NOW);
+    }
+
     this.stop = function() {
         this.enumerateConnectionsTimer && clearTimeout(this.enumerateConnectionsTimer);
         this.workQueueTimer && clearTimeout(this.workQueueTimer);
+        this.enumerateConnectionsTimer = undefined;
+        this.workQueueTimer = undefined;
     };
 
-    enumerateConnectionsTimer = setTimeout(enumerateConnections.bind(this), RUN_NOW);
-    workQueueTimer = setTimeout(pollFromQueue.bind(this), RUN_NOW);
+    this.start();
 };
 
 const shouldPoll = function(state) {
