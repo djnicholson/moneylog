@@ -18,11 +18,12 @@ page.goto('https://wwws.betterment.com/app/login')
             return Promise.resolve();
         }
     })
-    .then(() => page.$(".summary-info ul li:nth-child(2) .data-value"))
+    .then(() => page.goto('https://wwws.betterment.com/app/performance'))
+    .then(() => page.$(".ft-balanceCard .sc-Card-header .LabeledHeading"))
     .then(element => page.evaluate(e => e.textContent, element))
     .then(balance => {
         if (balance) {
-            result = -1.0 * balance.replace(/[$,]/g, "");
+            result = balance.replace(/[$,]/g, "");
         }
     });
 
