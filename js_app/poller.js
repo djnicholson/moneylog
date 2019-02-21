@@ -85,7 +85,7 @@ const Poller = function() {
                 state[filename] = state[filename] || { lastSuccess: 0, lastFail: 0, result: undefined, failCount: 0 };
                 if (shouldPoll(state[filename])) {
                     return runner.evaluate(connection.metadata).then(result => {
-                        if (typeof result != "number") {
+                        if ((typeof result != "number") || (result == null) || (result == undefined) || isNaN(result)) {
                             throw Error("Invalid result extracted by runner: " + result);
                         }
 
